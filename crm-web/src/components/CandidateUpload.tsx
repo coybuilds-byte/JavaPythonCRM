@@ -51,8 +51,9 @@ export default function CandidateUpload() {
         formData.append('file', file)
 
         try {
-            // TODO: Point this to Java Backend usually, but for now AI service directly
-            const response = await fetch('http://localhost:8000/parse-resume', {
+            // Point to Java Backend which proxies to AI service
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+            const response = await fetch(`${apiUrl}/api/candidates/parse`, {
                 method: 'POST',
                 body: formData,
             })
