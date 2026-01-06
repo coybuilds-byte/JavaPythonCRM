@@ -21,7 +21,7 @@ services:
     plan: free
 
   # Frontend (Static Site)
-  - type: pstatic
+  - type: web
     name: crm-frontend
     env: static
     buildCommand: cd crm-web && npm install && npm run build
