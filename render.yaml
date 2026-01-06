@@ -25,7 +25,7 @@ services:
     name: crm-frontend
     env: static
     buildCommand: cd crm-web && npm install && npm run build
-    publishDir: crm-web/dist
+    staticPublishPath: crm-web/dist
     envVars:
       - key: VITE_API_URL
         value: https://crm-backend.onrender.com # Helper to auto-update may be needed
