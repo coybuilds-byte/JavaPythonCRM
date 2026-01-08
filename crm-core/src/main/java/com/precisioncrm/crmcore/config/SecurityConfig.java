@@ -47,7 +47,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         // Defining users as per requirements
-        UserDetails user1 = User.withUsername("Jesse@precisionsourcemanagement.com")
+        UserDetails user1 = User.withUsername("jesse@precisionsourcemanagement.com")
                 .password("{noop}Staffpass1!")
                 .roles("RECRUITER", "ADMIN")
                 .build();
