@@ -3,10 +3,11 @@ import CandidateUpload from './CandidateUpload'
 
 interface DashboardProps {
     user: string
+    authHeader: string
     onLogout: () => void
 }
 
-export default function Dashboard({ user, onLogout }: DashboardProps) {
+export default function Dashboard({ user, authHeader, onLogout }: DashboardProps) {
     const [view, setView] = useState<'candidates' | 'clients'>('candidates')
 
     return (
@@ -85,7 +86,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                                 AI-Powered Resume Parsing & Matching
                             </p>
                         </header>
-                        <CandidateUpload />
+                        <CandidateUpload authHeader={authHeader} />
                     </div>
                 )}
 

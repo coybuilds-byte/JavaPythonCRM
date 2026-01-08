@@ -9,7 +9,11 @@ interface ParsedResult {
     text_content?: string
 }
 
-export default function CandidateUpload() {
+interface CandidateUploadProps {
+    authHeader: string
+}
+
+export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
     const [file, setFile] = useState<File | null>(null)
     const [status, setStatus] = useState<string>('')
     const [result, setResult] = useState<ParsedResult | null>(null)
@@ -55,6 +59,9 @@ export default function CandidateUpload() {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
             const response = await fetch(`${apiUrl}/api/candidates/parse`, {
                 method: 'POST',
+                headers: {
+                    'Authorization': authHeader
+                },
                 body: formData,
             })
 
