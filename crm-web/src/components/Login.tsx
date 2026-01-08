@@ -1,5 +1,9 @@
 import { useState } from 'react'
 import '../index.css'
+// @ts-ignore
+import psmLogo from '../assets/psm-logo.jpg'
+// @ts-ignore
+import bgImage from '../assets/tech_background_hd.png' 
 
 interface LoginProps {
     onLogin: (user: string, authHeader: string) => void
@@ -114,9 +118,29 @@ export default function Login({ onLogin }: LoginProps) {
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-            <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '2.5rem' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--primary)' }}>Precision CRM</h2>
+        <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '100vh',
+            backgroundImage: `linear-gradient(rgba(12, 26, 50, 0.7), rgba(12, 26, 50, 0.85)), url(${bgImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        }}>
+            <div className="card" style={{ 
+                width: '100%', 
+                maxWidth: '400px', 
+                padding: '2.5rem',
+                border: '1px solid rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(10px)',
+                background: 'rgba(19, 34, 63, 0.8)'
+            }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <img src={psmLogo} alt="PSM Logo" style={{ width: '80px', height: 'auto', marginBottom: '1rem', borderRadius: '8px' }} />
+                    <h2 style={{ color: 'white', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '1.5rem' }}>PSM Recruiter Portal</h2>
+                </div>
                 <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email Address</label>
