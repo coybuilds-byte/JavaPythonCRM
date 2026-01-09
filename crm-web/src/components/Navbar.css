@@ -2,33 +2,27 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 64px;
-    padding: 0 24px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    height: 70px; /* Slightly taller */
+    padding: 0 32px;
+    background-color: var(--primary-dark); /* Dark Navy */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    box-shadow: var(--shadow-md);
+    color: white;
 }
 
 .navbar-brand a {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
 }
 
-.logo-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: #2563eb;
-    color: white;
-    border-radius: 6px;
-    font-size: 0.8rem;
+/* Logo Image Styling */
+.navbar-logo-img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
 }
 
 .navbar-links {
@@ -42,36 +36,38 @@
     gap: 8px;
     padding: 8px 16px;
     text-decoration: none;
-    color: #64748b;
+    color: #94a3b8; /* Muted text on dark bg */
     font-weight: 500;
     border-radius: 6px;
     transition: all 0.2s;
+    font-size: 0.95rem;
 }
 
 .nav-item:hover {
-    background-color: #f1f5f9;
-    color: #0f172a;
+    background-color: rgba(255,255,255,0.1);
+    color: white;
 }
 
 .nav-item.active {
-    background-color: #eff6ff;
-    color: #2563eb;
+    background-color: var(--primary); /* Lighter blue for active state */
+    color: white;
+    border-bottom: 2px solid var(--accent); /* Gold highlight */
 }
 
 .navbar-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
 }
 
 .search-bar {
     display: flex;
     align-items: center;
-    background: #f1f5f9;
-    padding: 6px 12px;
-    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
     gap: 8px;
-    color: #64748b;
+    color: #cbd5e1;
 }
 
 .search-bar input {
@@ -80,26 +76,35 @@
     outline: none;
     font-size: 0.9rem;
     width: 200px;
+    color: white;
+}
+
+.search-bar input::placeholder {
+    color: #64748b;
 }
 
 .icon-btn {
     background: none;
     border: none;
     cursor: pointer;
-    color: #64748b;
-    padding: 4px;
-    border-radius: 4px;
+    color: #cbd5e1;
+    padding: 6px;
+    border-radius: 6px;
+    transition: color 0.2s;
 }
 
 .icon-btn:hover {
-    background: #f1f5f9;
-    color: #0f172a;
+    background: rgba(255,255,255,0.1);
+    color: white;
 }
 
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    color: #334155;
+    gap: 10px;
+    font-weight: 600;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
 }

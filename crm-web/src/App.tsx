@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard';
 import CandidateProfile from './pages/CandidateProfile';
 import ClientProfile from './pages/ClientProfile';
 import Login from './components/Login';
-import CandidateUpload from './components/CandidateUpload'; // Keeping for now as a sub-feature
+// import CandidateUpload from './components/CandidateUpload';
 import './App.css'; 
 
 // Placeholder pages

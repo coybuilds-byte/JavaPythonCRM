@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Plus, FileText } from 'lucide-react';
+import { Search, Filter, Plus } from 'lucide-react';
 import './CandidatesList.css';
 import CandidateUpload from '../components/CandidateUpload';
 

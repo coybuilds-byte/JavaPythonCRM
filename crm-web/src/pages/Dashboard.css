@@ -1,55 +1,71 @@
 .dashboard-container {
-    padding: 24px;
-    max-width: 1400px;
+    padding: 32px;
+    max-width: 1600px;
     margin: 0 auto;
 }
 
 .page-header {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 }
 
 .page-header h1 {
-    font-size: 1.8rem;
-    color: #1a1a1a;
-    margin-bottom: 4px;
+    font-size: 2rem;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-weight: 700;
 }
 
 .page-header p {
-    color: #64748b;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 24px;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
 }
 
 .stat-card {
     background: white;
-    padding: 20px;
+    padding: 24px;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
-    gap: 16px;
-    border: 1px solid #e2e8f0;
+    gap: 20px;
+    border: 1px solid var(--border);
+    border-top: 4px solid transparent; /* Prepare for accent color */
+    transition: transform 0.2s;
 }
 
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Specific Accent Colors */
+.stat-card:nth-child(1) { border-top-color: var(--primary-light); }
+.stat-card:nth-child(2) { border-top-color: var(--accent); }
+.stat-card:nth-child(3) { border-top-color: #10b981; }
+.stat-card:nth-child(4) { border-top-color: #8b5cf6; }
+
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
+    font-size: 1.5rem;
 }
 
-.stat-icon.candidate { background-color: #3b82f6; }
-.stat-icon.job { background-color: #10b981; }
-.stat-icon.interview { background-color: #f59e0b; }
-.stat-icon.revenue { background-color: #8b5cf6; }
+.stat-icon.candidate { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.stat-icon.job { background: linear-gradient(135deg, #f59e0b, #b45309); }
+.stat-icon.interview { background: linear-gradient(135deg, #10b981, #047857); }
+.stat-icon.revenue { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
 
 .stat-info {
     display: flex;
@@ -58,59 +74,47 @@
 
 .stat-label {
     font-size: 0.9rem;
-    color: #64748b;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
 }
 
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: #0f172a;
-}
-
-.dashboard-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-}
-
-.card {
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    color: var(--primary-dark);
 }
 
 .activity-feed .feed-list {
-    list-style: none;
-    padding: 0;
-    margin-top: 16px;
+    position: relative;
+    padding-left: 20px; /* Space for line */
+}
+
+/* Vertical Line */
+.activity-feed .feed-list::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
 }
 
 .activity-feed li {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
     position: relative;
+    margin-bottom: 24px;
 }
 
 .activity-feed .bullet {
-    width: 10px;
-    height: 10px;
-    background: #e2e8f0;
+    position: absolute;
+    left: -25px; /* Adjust based on padding */
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    background: var(--surface);
+    border: 2px solid var(--primary);
     border-radius: 50%;
-    margin-top: 6px;
-    flex-shrink: 0;
-}
-
-.activity-feed .feed-text {
-    font-size: 0.95rem;
-    color: #334155;
-}
-
-.activity-feed .time {
-    display: block;
-    font-size: 0.8rem;
-    color: #94a3b8;
-    margin-top: 4px;
+    z-index: 2;
 }

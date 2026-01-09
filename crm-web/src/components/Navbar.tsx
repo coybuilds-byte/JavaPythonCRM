@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/dashboard">
-             <span className="logo-icon">Target</span> Precision CRM
+             <img src="/logo.jpg" alt="PSM Logo" className="navbar-logo-img" />
         </Link>
       </div>
       
@@ -28,9 +28,6 @@ export default function Navbar() {
         <Link to="/job-orders" className={`nav-item ${isActive('/job-orders')}`}>
           <FileText size={18} /> Job Orders
         </Link>
-        <Link to="/reports" className={`nav-item ${isActive('/reports')}`}>
-          <FileText size={18} /> Reports
-        </Link>
       </div>
 
       <div className="navbar-actions">
@@ -41,7 +38,7 @@ export default function Navbar() {
         <button className="icon-btn"><Bell size={20} /></button>
         <button className="icon-btn"><Settings size={20} /></button>
         <div className="user-profile">
-            <User size={20} />
+            <User size={18} />
             <span>Jesse</span>
         </div>
       </div>
