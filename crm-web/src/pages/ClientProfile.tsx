@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import { Mail, Phone, MapPin, Plus, UserPlus } from 'lucide-react';
 import './ClientProfile.css';
 
