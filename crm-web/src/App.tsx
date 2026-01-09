@@ -8,8 +8,9 @@ import CandidateUpload from './components/CandidateUpload'; // Keeping for now a
 import './App.css'; 
 
 // Placeholder pages
-const Candidates = () => <div className="p-8"><h2>Candidates Page (Coming Soon)</h2><CandidateUpload authHeader="Basic ..." /></div>;
-const Clients = () => <div className="p-8"><h2>Clients Page (Coming Soon)</h2></div>;
+import CandidatesList from './pages/CandidatesList';
+import ClientsList from './pages/ClientsList';
+
 const JobOrders = () => <div className="p-8"><h2>Job Orders Page (Coming Soon)</h2></div>;
 
 function App() {
@@ -25,9 +26,9 @@ function App() {
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/login" element={<Login onLogin={() => {}} />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/candidates" element={<Candidates />} />
+                <Route path="/candidates" element={<CandidatesList />} />
                 <Route path="/candidates/:id" element={<CandidateProfile />} />
-                <Route path="/clients" element={<Clients />} />
+                <Route path="/clients" element={<ClientsList />} />
                 <Route path="/clients/:id" element={<ClientProfile />} />
                 <Route path="/job-orders" element={<JobOrders />} />
             </Routes>
