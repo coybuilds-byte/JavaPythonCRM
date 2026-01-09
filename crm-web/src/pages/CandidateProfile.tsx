@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Mail, Phone, MapPin, Linkedin, Briefcase, FileText } from 'lucide-react';
+import { Mail, Phone, MapPin, FileText } from 'lucide-react';
 import './CandidateProfile.css';
 
 interface Candidate {

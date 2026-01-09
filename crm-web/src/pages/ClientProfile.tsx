@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Mail, Phone, MapPin, Plus, UserPlus } from 'lucide-react';
 import './ClientProfile.css';
 
 export default function ClientProfile() {
-    const { id } = useParams();
+    // const { id } = useParams();
     // content mocked for visual match
     const client = {
         name: 'TechCorp Solutions',
