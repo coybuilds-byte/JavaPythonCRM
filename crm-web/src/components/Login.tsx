@@ -23,7 +23,9 @@ export default function Login({ onLogin }: LoginProps) {
         setIsLoading(true)
 
         // Create Basic Auth Header
-        const auth = 'Basic ' + btoa(email + ':' + password)
+        // Normalize email to lowercase to match backend case-insensitivity preference
+        const normalizedEmail = email.toLowerCase()
+        const auth = 'Basic ' + btoa(normalizedEmail + ':' + password)
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
         try {
@@ -46,7 +48,7 @@ export default function Login({ onLogin }: LoginProps) {
             // Fallback for demo/offline if API not reachable, but strictly warn
             if (password === 'Staffpass1!') {
                  console.warn("API unreachable, falling back to local check for demo")
-                 onLogin(email, auth)
+                 onLogin(normalizedEmail, auth)
             } else {
                  setError('Unable to connect to server')
             }
