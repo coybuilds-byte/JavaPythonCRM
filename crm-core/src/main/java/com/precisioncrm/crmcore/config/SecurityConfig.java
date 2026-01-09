@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/public/**", "/api/candidates/parse").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable Basic Auth

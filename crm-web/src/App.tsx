@@ -11,7 +11,8 @@ import './App.css';
 import CandidatesList from './pages/CandidatesList';
 import ClientsList from './pages/ClientsList';
 
-const JobOrders = () => <div className="p-8"><h2>Job Orders Page (Coming Soon)</h2></div>;
+import JobOrders from './pages/JobOrders';
+import Reports from './pages/Reports';
 
 function App() {
   // Temporary Auth Check (Should be context)
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/clients" element={<ClientsList />} />
                 <Route path="/clients/:id" element={<ClientProfile />} />
                 <Route path="/job-orders" element={<JobOrders />} />
+                <Route path="/reports" element={<Reports />} />
             </Routes>
         </main>
       </div>

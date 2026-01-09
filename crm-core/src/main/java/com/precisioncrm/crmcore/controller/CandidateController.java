@@ -74,7 +74,7 @@ public class CandidateController {
     }
 
     @PostMapping("/parse")
-    public ResponseEntity<String> parseResume(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file) {
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
@@ -86,11 +86,34 @@ public class CandidateController {
 
             String url = aiServiceUrl + "/parse-resume";
             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
+            
+            if (response.getBody() == null) {
+                return ResponseEntity.badRequest().build();
+            }
 
-            return ResponseEntity.ok(response.getBody());
+            // Parse JSON response
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(response.getBody());
+
+            Candidate candidate = new Candidate();
+            candidate.setName(root.path("name").asText());
+            candidate.setEmail(root.path("email").asText());
+            candidate.setPhone(root.path("phone").asText());
+            // Map skills
+            if (root.has("skills")) {
+                java.util.List<String> skills = new java.util.ArrayList<>();
+                root.path("skills").forEach(node -> skills.add(node.asText()));
+                candidate.setSkills(skills);
+            }
+            candidate.setResumeText(root.path("text_content").asText());
+            candidate.setStatus("New"); // Default status
+
+            Candidate savedCandidate = candidateRepository.save(candidate);
+
+            return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error parsing resume: " + e.getMessage());
+            return ResponseEntity.status(500).build();
         }
     }
 }

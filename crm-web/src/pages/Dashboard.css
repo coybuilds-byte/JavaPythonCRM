@@ -28,7 +28,8 @@
 }
 
 .stat-card {
-    background: white;
+    /* Background handled by .card or global styles if class added, otherwise specific: */
+    background: var(--surface); 
     padding: 24px;
     border-radius: 12px;
     box-shadow: var(--shadow-sm);
@@ -36,7 +37,7 @@
     align-items: center;
     gap: 20px;
     border: 1px solid var(--border);
-    border-top: 4px solid transparent; /* Prepare for accent color */
+    border-top: 4px solid transparent; 
     transition: transform 0.2s;
 }
 
