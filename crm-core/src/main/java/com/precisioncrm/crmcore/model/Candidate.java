@@ -19,6 +19,8 @@ public class Candidate {
     // New Fields
     private String status; // e.g., 'Active', 'Placed', 'Interviewing'
     private String location;
+    private String address; // Street address or more specific location
+    private String cell; // Cell phone separate from primary phone
     private String currentTitle;
     private Integer yearsExperience;
 
@@ -48,6 +50,10 @@ public class Candidate {
     public void setStatus(String status) { this.status = status; }
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getCell() { return cell; }
+    public void setCell(String cell) { this.cell = cell; }
     public String getCurrentTitle() { return currentTitle; }
     public void setCurrentTitle(String currentTitle) { this.currentTitle = currentTitle; }
     public Integer getYearsExperience() { return yearsExperience; }

@@ -137,7 +137,7 @@ export default function Login({ onLogin }: LoginProps) {
                 padding: '2.5rem',
                 border: '1px solid rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
-                background: 'rgba(19, 34, 63, 0.8)'
+                background: 'rgba(21, 35, 66, 0.9)' // Slightly transparent version of var(--surface)
             }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <img src={psmLogo} alt="PSM Logo" style={{ width: '80px', height: 'auto', marginBottom: '1rem', borderRadius: '8px' }} />

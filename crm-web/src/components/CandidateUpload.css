@@ -9,23 +9,23 @@
 
 .dropzone {
     border: 2px dashed var(--border);
-    border-radius: var(--radius);
+    border-radius: 8px;
     padding: 3rem;
     text-align: center;
     transition: all 0.2s;
-    background: rgba(30, 41, 59, 0.5);
+    background: rgba(21, 35, 66, 0.3); /* Surface tint */
     color: var(--text-secondary);
 }
 
 .dropzone.dragging {
     border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(247, 181, 0, 0.1); /* Gold tint */
 }
 
 .dropzone.has-file {
     border-style: solid;
-    border-color: var(--success);
-    color: var(--text);
+    border-color: var(--accent); /* Sky Blue */
+    color: var(--text-main);
 }
 
 .dropzone .icon {
@@ -35,11 +35,12 @@
 
 .file-input-label {
     color: var(--primary);
-    font-weight: 500;
+    font-weight: 700;
     cursor: pointer;
 }
 
 .file-input-label:hover {
+    color: var(--primary-hover);
     text-decoration: underline;
 }
 
@@ -50,6 +51,10 @@
 
 .result-card {
     animation: slideUp 0.3s ease-out;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 8px;
 }
 
 @keyframes slideUp {
@@ -70,6 +75,7 @@
     width: 48px;
     height: 48px;
     background: var(--primary);
+    color: black; /* Contrast for Gold */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -91,9 +97,10 @@
 }
 
 .skill-tag {
-    background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    background: rgba(135, 206, 235, 0.15); /* Sky Blue tint */
+    color: var(--accent);
     padding: 0.25rem 0.75rem;
     border-radius: 100px;
     font-size: 0.85rem;
+    border: 1px solid rgba(135, 206, 235, 0.2);
 }

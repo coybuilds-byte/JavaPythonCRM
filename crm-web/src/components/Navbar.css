@@ -2,12 +2,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px; /* Slightly taller */
+    height: 70px;
     padding: 0 32px;
     background-color: var(--primary-dark); /* Dark Navy */
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-md);
-    color: white;
+    color: var(--text-main);
 }
 
 .navbar-brand a {
@@ -15,7 +15,7 @@
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: white;
+    color: var(--text-main);
 }
 
 /* Logo Image Styling */
@@ -36,7 +36,7 @@
     gap: 8px;
     padding: 8px 16px;
     text-decoration: none;
-    color: #94a3b8; /* Muted text on dark bg */
+    color: var(--text-secondary);
     font-weight: 500;
     border-radius: 6px;
     transition: all 0.2s;
@@ -44,14 +44,15 @@
 }
 
 .nav-item:hover {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
+    background-color: rgba(255,255,255,0.05);
+    color: var(--text-main);
 }
 
 .nav-item.active {
-    background-color: var(--primary); /* Lighter blue for active state */
-    color: white;
-    border-bottom: 2px solid var(--accent); /* Gold highlight */
+    background-color: var(--primary); /* Gold/Yellow */
+    color: black;
+    border-bottom: none; /* Removed bottom border style for button-like active state */
+    font-weight: 600;
 }
 
 .navbar-actions {

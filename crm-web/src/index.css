@@ -1,26 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Brand Colors (Dark Mode Base) */
-    --primary-dark: #0f172a;   /* Main Background - Deep Navy */
-    --primary: #1e3a8a;        /* Deep Blue */
-    --primary-light: #3b82f6;  /* Bright Blue */
-    --accent: #f59e0b;         /* Gold/Amber */
+    /* Brand Colors (Precision Source Management) */
+    --primary-dark: #0c1a32;   /* Main Background - Deep Navy */
+    --primary: #f7b500;        /* Gold/Yellow - Primary Actions */
+    --primary-hover: #e0a800;  /* Darker Gold */
+    --accent: #87ceeb;         /* Sky Blue - AI/Tech Accent */
     
     /* Surface Colors */
-    --bg-color: #0f172a;       /* Matching Primary Dark */
-    --surface: #1e293b;        /* Lighter Navy for Cards */
-    --surface-hover: #334155;
+    --bg-color: #0c1a32;       /* Matching Primary Dark */
+    --surface: #152342;        /* Slightly lighter Navy for Cards */
+    --surface-hover: #1e3a8a;  /* Blue tint on hover */
     
     /* Text Colors */
-    --text-main: #f8fafc;      /* White-ish */
-    --text-secondary: #94a3b8; /* Muted Slate */
-    --border: #334155;         /* Dark Border */
+    --text-main: #ffffff;      /* Pure White */
+    --text-secondary: #cbd5e1; /* Light Slate */
+    --border: #2d3f5e;         /* Nav/Card Borders */
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -73,27 +73,31 @@ a {
 
 /* Button Styles */
 .btn-primary {
-    background: var(--primary-light); /* Brighter blue for visibility */
-    color: white;
+    background: var(--primary); /* Gold */
+    color: #000000;             /* Black text on Gold */
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 6px;         /* Slightly sharper corners for modern look */
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
 }
 
 .btn-primary:hover {
-    background: #2563eb;
+    background: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
 /* Secondary Button (Dark Mode) */
 .btn-secondary {
     background: transparent;
     border: 1px solid var(--border);
-    color: var(--text-secondary);
+    color: var(--text-main);
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: 500;
     cursor: pointer;
     display: flex;
@@ -103,15 +107,14 @@ a {
 }
 
 .btn-secondary:hover {
-    background: var(--surface-hover);
-    color: var(--text-main);
-    border-color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05); /* Subtle white tint */
+    border-color: var(--text-main);
 }
 
 .btn-secondary.active {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--primary-light);
-    border-color: var(--primary-light);
+    background: rgba(247, 181, 0, 0.1); /* Gold tint */
+    color: var(--primary);
+    border-color: var(--primary);
 }
 
 /* Inputs (Dark Mode) */

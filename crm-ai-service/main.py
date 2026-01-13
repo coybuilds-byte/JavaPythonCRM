@@ -12,6 +12,8 @@ class CandidateProfile(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    cell: Optional[str] = None
+    address: Optional[str] = None
     skills: List[str] = []
     text_content: Optional[str] = None
 
@@ -33,9 +35,16 @@ def extract_text(file_content: bytes, filename: str) -> str:
     return text
 
 def extract_entities(text: str):
-    # Simple Fallback logic
+    # Improved fallback logic: Name is often the first non-empty line
     lines = [line.strip() for line in text.split('\n') if line.strip()]
-    return lines[0] if lines else "Unknown Candidate"
+    if not lines:
+        return "Unknown Candidate"
+    
+    # Heuristic: First line is likely name if it's short (e.g. < 5 words)
+    first_line = lines[0]
+    if len(first_line.split()) < 5:
+        return first_line
+    return "Unknown Candidate"
 
 def extract_contact_info(text: str):
     email = None
@@ -43,19 +52,32 @@ def extract_contact_info(text: str):
     if email_match:
         email = email_match.group(0)
         
-    phone = None
-    phone_match = re.search(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', text)
-    if phone_match:
-        phone = phone_match.group(0)
+    # Phone extraction supports multiple formats
+    # Looks for (555) 555-5555, 555-555-5555, 555.555.5555
+    phone_pattern = r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+    phones = re.findall(phone_pattern, text)
+    
+    phone = phones[0] if phones else None
+    cell = phones[1] if len(phones) > 1 else None # Heuristic: if 2 nums, maybe 2nd is cell
         
-    return email, phone
+    return email, phone, cell
 
+def extract_address(text: str):
+    # Regex for US-style address: 123 Main St, City, ST 12345
+    # Anchored to start of line to avoid merging with previous lines
+    address_pattern = r'(?m)^(.*?,\s*[A-Z]{2}\s*\d{5})$'
+    match = re.search(address_pattern, text)
+    if match:
+        return match.group(0).strip()
+    return None
+    
 def extract_skills(text: str):
     common_skills = [
         "Java", "Python", "React", "Angular", "Vue", "Spring Boot", "Node.js", 
         "SQL", "NoSQL", "Docker", "Kubernetes", "AWS", "Azure", "GCP",
         "Machine Learning", "AI", "Data Science", "Git", "CI/CD",
-        "Communication", "Leadership", "Management"
+        "Communication", "Leadership", "Management", "Agile", "Scrum",
+        "JavaScript", "TypeScript", "HTML", "CSS", "C++", "C#", ".NET"
     ]
     
     found_skills = []
@@ -79,13 +101,16 @@ async def parse_resume(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="Could not extract text from file")
     
     name = extract_entities(text)
-    email, phone = extract_contact_info(text)
+    email, phone, cell = extract_contact_info(text)
+    address = extract_address(text)
     skills = extract_skills(text)
     
     return CandidateProfile(
         name=name,
         email=email,
         phone=phone,
+        cell=cell,
+        address=address,
         skills=skills,
         text_content=text[:1000] # Truncated
     )

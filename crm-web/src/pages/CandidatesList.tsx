@@ -10,6 +10,8 @@ interface CandidateSummary {
     title: string;
     status: string;
     location: string;
+    address?: string; // New
+    cell?: string;    // New
 }
 
 export default function CandidatesList() {
@@ -19,16 +21,13 @@ export default function CandidatesList() {
     useEffect(() => {
         // Mock data for now, replace with fetch
         setCandidates([
-            { id: 1, name: 'John Doe', title: 'Senior Software Engineer', status: 'Active', location: 'New York, NY' },
-            { id: 2, name: 'Sarah Smith', title: 'Product Manager', status: 'Interviewing', location: 'San Francisco, CA' },
-            { id: 3, name: 'Mike Johnson', title: 'Sales Executive', status: 'Placed', location: 'Chicago, IL' },
+            { id: 1, name: 'John Doe', title: 'Senior Software Engineer', status: 'Active', location: 'New York, NY', address: '123 Broadway, NY 10001', cell: '(555) 123-4455' },
+            { id: 2, name: 'Sarah Smith', title: 'Product Manager', status: 'Interviewing', location: 'San Francisco, CA', address: '456 Market St, SF 94105', cell: '(555) 987-6543' },
+            { id: 3, name: 'Mike Johnson', title: 'Sales Executive', status: 'Placed', location: 'Chicago, IL', address: '789 State St, IL 60601', cell: '(555) 555-1212' },
         ]);
     }, []);
 
-    // Basic Auth for 'jesse@precisionsourcemanagement.com:Staffpass1!'
-    // Base64 of jesse@precisionsourcemanagement.com:Staffpass1! is amVzc2VAcHJlY2lzaW9uc291cmNlbWFuYWdlbWVudC5jb206U3RhZmZwYXNzMSE=
-    // In a real app this comes from Login state
-    const authHeader = "Basic amVzc2VAcHJlY2lzaW9uc291cmNlbWFuYWdlbWVudC5jb206U3RhZmZwYXNzMSE=";
+    // ... (Auth Header remains)
 
     return (
         <div className="page-container">
@@ -71,17 +70,31 @@ export default function CandidatesList() {
                         </div>
                     </div>
 
-                    <div className="candidates-grid">
+                    <div className="candidates-list-view">
+                         <div className="list-header">
+                            <span>Name / Role</span>
+                            <span>Status</span>
+                            <span>Location</span>
+                            <span>Contact</span>
+                         </div>
                         {candidates.map(candidate => (
-                            <Link to={`/candidates/${candidate.id}`} key={candidate.id} className="candidate-card card">
-                                <div className="avatar">{candidate.name.charAt(0)}</div>
-                                <div className="candidate-info">
-                                    <h3>{candidate.name}</h3>
-                                    <p className="role">{candidate.title}</p>
-                                    <div className="meta">
-                                        <span className={`status-pill ${candidate.status.toLowerCase()}`}>{candidate.status}</span>
-                                        <span className="location">{candidate.location}</span>
+                            <Link to={`/candidates/${candidate.id}`} key={candidate.id} className="candidate-row card">
+                                <div className="candidate-main-info">
+                                    <div className="avatar">{candidate.name.charAt(0)}</div>
+                                    <div>
+                                        <h3>{candidate.name}</h3>
+                                        <p className="role">{candidate.title}</p>
                                     </div>
+                                </div>
+                                <div>
+                                    <span className={`status-pill ${candidate.status.toLowerCase()}`}>{candidate.status}</span>
+                                </div>
+                                <div className="location-info">
+                                    <span>{candidate.location}</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{candidate.address}</span>
+                                </div>
+                                <div className="contact-info-col">
+                                    <span>{candidate.cell || 'No Cell'}</span>
                                 </div>
                             </Link>
                         ))}

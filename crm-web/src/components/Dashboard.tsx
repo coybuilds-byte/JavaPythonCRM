@@ -16,7 +16,7 @@ export default function Dashboard({ user, authHeader, onLogout }: DashboardProps
             <nav style={{ 
                 borderBottom: '1px solid var(--border)', 
                 padding: '0.75rem 2rem', 
-                background: 'rgba(12, 26, 50, 0.95)', 
+                background: 'rgba(12, 26, 50, 0.95)', // Matches brand navy
                 backdropFilter: 'blur(8px)',
                 position: 'sticky',
                 top: 0,

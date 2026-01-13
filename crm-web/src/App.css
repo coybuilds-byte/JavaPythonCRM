@@ -1,8 +1,8 @@
+/* Global App Styles */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
@@ -34,9 +34,10 @@
 }
 
 .card {
+  /* Inherit from index.css or define here if global */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
   padding: 2em;
 }
 
-.read-the-docs {
-  color: #888;
-}

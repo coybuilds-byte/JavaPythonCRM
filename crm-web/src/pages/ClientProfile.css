@@ -11,30 +11,33 @@
     display: flex;
     gap: 24px;
     padding: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
 }
 
 .client-logo-placeholder {
     width: 120px;
     height: 120px;
-    background: #f1f5f9;
+    background: rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px dashed #cbd5e1;
-    color: #64748b;
+    border: 1px dashed var(--border);
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .client-details h2 {
     font-size: 1.5rem;
     margin-bottom: 8px;
-    color: #1e293b;
+    color: var(--text-main);
 }
 
 .contact-person {
     font-weight: 500;
     margin-bottom: 12px;
-    color: #334155;
+    color: var(--text-secondary);
 }
 
 .contact-row {
@@ -42,7 +45,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 6px;
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 .middle-section {
@@ -59,9 +62,9 @@
 }
 
 .btn-small {
-    background: #eff6ff;
-    color: #2563eb;
-    border: none;
+    background: rgba(247, 181, 0, 0.1);
+    color: var(--primary);
+    border: 1px solid var(--primary);
     padding: 6px 12px;
     border-radius: 6px;
     font-weight: 500;
@@ -79,15 +82,15 @@
 .job-table th {
     text-align: left;
     padding: 12px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #64748b;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .job-table td {
     padding: 12px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
 }
 
 .status-pill {
@@ -97,11 +100,11 @@
     font-weight: 600;
 }
 
-.status-pill.open { background: #dcfce7; color: #15803d; }
-.status-pill.in-progress { background: #dbeafe; color: #2563eb; }
+.status-pill.open { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-pill.in-progress { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
 
 .drag-drop-area {
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed var(--border);
     border-radius: 8px;
     height: 120px;
     display: flex;
@@ -109,22 +112,24 @@
     align-items: center;
     justify-content: center;
     margin: 16px 0;
-    background: #f8fafc;
-    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-secondary);
 }
 
 .assignment-controls select {
     width: 100%;
     padding: 8px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
     border-radius: 6px;
     margin-bottom: 8px;
+    background: var(--bg-color);
+    color: var(--text-main);
 }
 
 .btn-primary.full-width {
     width: 100%;
-    background: #2563eb;
-    color: white;
+    background: var(--primary);
+    color: black;
     border: none;
     padding: 10px;
     border-radius: 6px;
@@ -143,8 +148,8 @@
     align-items: center;
     gap: 12px;
     padding: 12px 0;
-    border-bottom: 1px solid #f1f5f9;
-    color: #475569;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
 }
 
 .time-item {
@@ -157,13 +162,13 @@
 .time-dot {
     width: 12px;
     height: 12px;
-    background: #cbd5e1;
+    background: var(--border);
     border-radius: 50%;
     margin-top: 5px;
 }
 
 .time-item p {
     margin: 0;
-    color: #334155;
+    color: var(--text-main);
     font-size: 0.95rem;
 }

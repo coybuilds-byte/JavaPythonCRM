@@ -1,4 +1,4 @@
-import { BarChart2, TrendingUp, Users } from 'lucide-react';
+import { BarChart2, TrendingUp } from 'lucide-react';
 import './Reports.css';
 
 export default function Reports() {

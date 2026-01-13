@@ -55,9 +55,8 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
         formData.append('file', file)
 
         try {
-            // Point to Java Backend which proxies to AI service
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-            const response = await fetch(`${apiUrl}/api/candidates/parse`, {
+            // Use relative path which is proxied by Vite
+            const response = await fetch(`/api/candidates/parse`, {
                 method: 'POST',
                 headers: {
                     'Authorization': authHeader

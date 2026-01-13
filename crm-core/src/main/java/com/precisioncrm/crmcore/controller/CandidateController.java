@@ -99,6 +99,8 @@ public class CandidateController {
             candidate.setName(root.path("name").asText());
             candidate.setEmail(root.path("email").asText());
             candidate.setPhone(root.path("phone").asText());
+            candidate.setAddress(root.path("address").asText());
+            candidate.setCell(root.path("cell").asText());
             // Map skills
             if (root.has("skills")) {
                 java.util.List<String> skills = new java.util.ArrayList<>();
