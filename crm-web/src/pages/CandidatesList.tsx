@@ -17,7 +17,7 @@ interface Candidate {
     phone: string;
 }
 
-import { DEFAULT_PREFS, ViewPreferences } from '../components/ViewSettingsModal';
+import { DEFAULT_PREFS, type ViewPreferences } from '../components/ViewSettingsModal';
 
 export default function CandidatesList() {
     const location = useLocation();
@@ -98,6 +98,7 @@ export default function CandidatesList() {
         }
     }, [initialMode, initialQuery]);
 
+    useEffect(() => {
         const timer = setTimeout(() => {
             if (viewMode === 'list') {
                 fetchCandidates();

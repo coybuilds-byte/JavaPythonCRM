@@ -13,7 +13,7 @@ interface Client {
     jobOrders?: any[]; // We only need length, type optional for now
 }
 
-import { DEFAULT_PREFS, ViewPreferences } from '../components/ViewSettingsModal'; // Import types
+import { DEFAULT_PREFS, type ViewPreferences } from '../components/ViewSettingsModal'; // Import types
 
 export default function ClientsList() {
     const [clients, setClients] = useState<Client[]>([]);

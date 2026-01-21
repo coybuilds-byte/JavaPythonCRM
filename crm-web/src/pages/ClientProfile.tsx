@@ -192,7 +192,7 @@ export default function ClientProfile() {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                 body: JSON.stringify({
-                    to: user ? user.email : 'recruiter@precisionsourcemanagement.com', 
+                    to: 'recruiter@precisionsourcemanagement.com', 
                     subject: `Interview Confirmation: ${candidateName} for ${jobTitle}`,
                     body: `Interview scheduled for ${date} at ${time}.\nCandidate: ${candidateName}\nType: ${type}\nNotes: ${notes}`
                  })

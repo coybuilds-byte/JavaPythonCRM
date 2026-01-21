@@ -12,7 +12,7 @@ import JobOrders from './pages/JobOrders';
 import Reports from './pages/Reports';
 import './App.css'; 
 
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
     const { isAuthenticated } = useAuth();
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;

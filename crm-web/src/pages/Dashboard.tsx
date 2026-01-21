@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Briefcase, Calendar, TrendingUp, Search, Bell } from 'lucide-react';
+import { Users, Briefcase, Calendar } from 'lucide-react';
 import './Dashboard.css';
 
 export default function Dashboard() {

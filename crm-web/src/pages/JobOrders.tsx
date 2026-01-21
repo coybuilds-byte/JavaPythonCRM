@@ -93,7 +93,7 @@ export default function JobOrders() {
             if (res.ok) {
                 fetchJobs();
                 setShowModal(false);
-                setNewJob({ title: '', clientId: '', description: '', status: 'Open' });
+                setNewJob({ title: '', clientId: '', description: '', status: 'Open', sizzle: '' });
             } else {
                 alert('Failed to create job');
             }

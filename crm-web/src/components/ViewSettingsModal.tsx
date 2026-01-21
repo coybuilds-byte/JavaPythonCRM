@@ -58,7 +58,7 @@ export default function ViewSettingsModal({ onClose, onSave }: ViewSettingsModal
             ...prev,
             [category]: {
                 ...prev[category],
-                [field]: !prev[category][field as keyof typeof prev.clients] // Typescript hack for dynamic key
+                [field]: !(prev[category] as any)[field]
             }
         }));
     };
