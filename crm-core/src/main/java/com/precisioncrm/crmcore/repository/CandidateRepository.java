@@ -13,4 +13,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
             "LOWER(CAST(c.resumeText AS string)) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(s) LIKE LOWER(CONCAT('%', :query, '%'))")
     java.util.List<Candidate> searchCandidates(@org.springframework.data.repository.query.Param("query") String query);
+    
+    long countByStatus(String status);
+    java.util.List<Candidate> findTop5ByOrderByIdDesc();
 }

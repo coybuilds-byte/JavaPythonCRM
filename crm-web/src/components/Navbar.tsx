@@ -1,13 +1,27 @@
+import { useState } from 'react'; // Added useState
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Briefcase, FileText, Settings, Search, Bell, User } from 'lucide-react';
+import { Home, Users, Briefcase, FileText, Settings, Search, Bell, User, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import ViewSettingsModal from './ViewSettingsModal';
 import './Navbar.css';
 
 export default function Navbar() {
   const location = useLocation();
+  const { logout, user } = useAuth();
+  const [showMenu, setShowMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const isActive = (path: string) => location.pathname.startsWith(path) ? 'active' : '';
 
+  const handleLogout = () => {
+      if(confirm("Are you sure you want to log out?")) {
+          logout();
+          window.location.href = "/"; // Force redirect
+      }
+  };
+
   return (
+    <>
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/dashboard">
@@ -36,12 +50,38 @@ export default function Navbar() {
             <input type="text" placeholder="Search..." />
         </div>
         <button className="icon-btn"><Bell size={20} /></button>
-        <button className="icon-btn"><Settings size={20} /></button>
+        
+        <div style={{position:'relative'}}>
+            <button className="icon-btn" onClick={() => setShowMenu(!showMenu)}><Settings size={20} /></button>
+            {showMenu && (
+                <div className="dropdown-menu" style={{
+                    position:'absolute', top:'100%', right:0, 
+                    background:'#1a1f2e', border:'1px solid var(--border)', 
+                    padding:'8px', borderRadius:'4px', width:'160px', zIndex:1000
+                }}>
+                    <div style={{padding:'8px', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px'}} 
+                        className="dropdown-item"
+                        onClick={() => { setShowSettings(true); setShowMenu(false); }}
+                    >
+                        <Settings size={14}/> View Settings
+                    </div>
+                    <div style={{padding:'8px', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', color:'#ff6b6b'}} 
+                         className="dropdown-item"
+                         onClick={handleLogout}
+                    >
+                        <LogOut size={14}/> Log Out
+                    </div>
+                </div>
+            )}
+        </div>
+
         <div className="user-profile">
             <User size={18} />
-            <span>Jesse</span>
+            <span>{user || 'User'}</span>
         </div>
       </div>
     </nav>
+    {showSettings && <ViewSettingsModal onClose={() => setShowSettings(false)} onSave={() => window.dispatchEvent(new Event('view-prefs-changed'))} />}
+    </>
   );
 }

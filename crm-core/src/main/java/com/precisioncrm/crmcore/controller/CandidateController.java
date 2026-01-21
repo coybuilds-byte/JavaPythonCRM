@@ -42,14 +42,29 @@ public class CandidateController {
     }
 
     @PostMapping
-    public Candidate create(@RequestBody Candidate candidate) {
+    public Candidate create(@RequestBody Candidate candidate, java.security.Principal principal) {
+        if (principal != null) {
+            candidate.setOwner(principal.getName());
+        }
         return candidateRepository.save(candidate);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Candidate> update(@PathVariable Long id, @RequestBody Candidate candidateDetails) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Candidate candidateDetails, java.security.Principal principal) {
         return candidateRepository.findById(id)
                 .map(candidate -> {
+                    // Ownership check
+                    if (candidateDetails.getOwner() != null && !candidateDetails.getOwner().equals(candidate.getOwner())) {
+                        boolean isAdmin = principal != null && principal.getName().contains("jesse");
+                        if (!isAdmin) {
+                             // If not admin, ignore owner change or error. 
+                             // Requirement: "only ever be changed by jesse".
+                             // We will just NOT update the owner field if not jesse, preserving original.
+                        } else {
+                            candidate.setOwner(candidateDetails.getOwner());
+                        }
+                    }
+                    
                     candidate.setName(candidateDetails.getName());
                     candidate.setEmail(candidateDetails.getEmail());
                     candidate.setPhone(candidateDetails.getPhone());
@@ -59,6 +74,8 @@ public class CandidateController {
                     candidate.setYearsExperience(candidateDetails.getYearsExperience());
                     candidate.setSkills(candidateDetails.getSkills());
                     candidate.setResumeText(candidateDetails.getResumeText());
+                    // Don't overwrite owner unless handled above
+                    
                     return ResponseEntity.ok(candidateRepository.save(candidate));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -79,7 +96,8 @@ public class CandidateController {
     }
 
     @PostMapping("/parse")
-    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file, @RequestParam(value = "owner", required = false) String owner) {
+    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file, java.security.Principal principal) {
+        String owner = (principal != null) ? principal.getName() : null;
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);

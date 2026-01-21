@@ -20,6 +20,8 @@ export default function CandidateProfile() {
     const [candidate, setCandidate] = useState<Candidate | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const [openJobs, setOpenJobs] = useState([]);
+
     useEffect(() => {
         const fetchCandidate = async () => {
             if (!id) return;
@@ -28,16 +30,22 @@ export default function CandidateProfile() {
                 if (res.ok) {
                     const data = await res.json();
                     setCandidate(data);
-                } else {
-                    console.error('Failed to fetch candidate');
                 }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
+            } catch (err) { console.error(err); } finally { setLoading(false); }
         };
+
+        const fetchJobs = async () => {
+             try {
+                 const res = await fetch('/api/job-orders');
+                 if (res.ok) {
+                     const data = await res.json();
+                     setOpenJobs(data.filter((j: any) => j.status === 'Open'));
+                 }
+             } catch (e) { console.error(e); }
+        };
+
         fetchCandidate();
+        fetchJobs();
     }, [id]);
 
     if (loading) return <div>Loading...</div>;
@@ -125,16 +133,32 @@ export default function CandidateProfile() {
                     </div>
                 </div>
 
-                {/* Job Order Assignment */}
+                 {/* Job Order Assignment */}
                 <div className="card assignment-card">
                     <div className="card-header-simple">Job Order Assignment</div>
                     <div className="assignment-body">
-                         <select className="job-select">
-                             <option>Select Job Order...</option>
-                             <option>Senior Java Developer</option>
-                             <option>Product Manager</option>
+                         <select 
+                            className="job-select" 
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    // Assign logic
+                                    const jobId = e.target.value;
+                                    fetch(`/api/job-orders/${jobId}/candidates/${id}`, { method: 'POST' })
+                                        .then(res => {
+                                            if(res.ok) alert('Candidate Assigned to Job!');
+                                            else alert('Assignment Failed');
+                                        });
+                                }
+                            }}
+                         >
+                             <option value="">Select Job Order...</option>
+                             {openJobs.map((job: any) => (
+                                 <option key={job.id} value={job.id}>{job.title} - {job.client?.companyName}</option>
+                             ))}
                          </select>
-                         <button className="btn-block">Generate Interview Link</button>
+                         <button className="btn-block" onClick={() => alert('Interview Link Generated: https://meet.jit.si/Interview-' + id + '-' + Math.floor(Math.random()*1000))}>
+                             Generate Interview Link
+                         </button>
                     </div>
                 </div>
 

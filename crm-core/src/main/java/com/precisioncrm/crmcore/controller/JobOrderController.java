@@ -32,9 +32,17 @@ public class JobOrderController {
         return jobOrderRepository.findByClientId(clientId);
     }
 
+    @Autowired
+    private com.precisioncrm.crmcore.repository.ClientRepository clientRepository;
+
     @PostMapping
-    public JobOrder create(@RequestBody JobOrder jobOrder) {
-        return jobOrderRepository.save(jobOrder);
+    public ResponseEntity<?> create(@RequestBody JobOrder jobOrder) {
+        if (jobOrder.getClient() != null && jobOrder.getClient().getId() != null) {
+            com.precisioncrm.crmcore.model.Client client = clientRepository.findById(jobOrder.getClient().getId()).orElse(null);
+            if(client == null) return ResponseEntity.badRequest().body("Client not found");
+            jobOrder.setClient(client);
+        }
+        return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
     }
 
     @PutMapping("/{id}")
@@ -45,12 +53,32 @@ public class JobOrderController {
                     jobOrder.setStatus(jobOrderDetails.getStatus());
                     jobOrder.setOpenPositions(jobOrderDetails.getOpenPositions());
                     jobOrder.setDescription(jobOrderDetails.getDescription());
-                    // Client linkage usually handled by passing client object or ID, 
-                    // assuming basic binding here for now
-                    if(jobOrderDetails.getClient() != null) jobOrder.setClient(jobOrderDetails.getClient());
+                    jobOrder.setSizzle(jobOrderDetails.getSizzle());
+                    
+                    if(jobOrderDetails.getClient() != null && jobOrderDetails.getClient().getId() != null) {
+                         // Ideally verify client exists
+                         clientRepository.findById(jobOrderDetails.getClient().getId())
+                            .ifPresent(jobOrder::setClient);
+                    }
+                    
                     return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Autowired
+    private com.precisioncrm.crmcore.repository.CandidateRepository candidateRepository;
+
+    @PostMapping("/{jobId}/candidates/{candidateId}")
+    public ResponseEntity<JobOrder> addCandidate(@PathVariable Long jobId, @PathVariable Long candidateId) {
+        return jobOrderRepository.findById(jobId)
+            .map(jobOrder -> {
+                return candidateRepository.findById(candidateId)
+                    .map(candidate -> {
+                        jobOrder.getCandidates().add(candidate);
+                        return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
+                    }).orElse(ResponseEntity.notFound().build());
+            }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")

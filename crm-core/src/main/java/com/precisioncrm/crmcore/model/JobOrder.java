@@ -53,6 +53,13 @@ public class JobOrder {
     public void setDescription(String description) { this.description = description; }
     public Client getClient() { return client; }
     public void setClient(Client client) { this.client = client; }
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String sizzle;
+
     public List<Candidate> getCandidates() { return candidates; }
     public void setCandidates(List<Candidate> candidates) { this.candidates = candidates; }
+    
+    public String getSizzle() { return sizzle; }
+    public void setSizzle(String sizzle) { this.sizzle = sizzle; }
 }

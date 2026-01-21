@@ -9,18 +9,30 @@ interface Client {
     companyName: string;
     industry: string;
     contactPerson: string;
+    phone?: string;
     jobOrders?: any[]; // We only need length, type optional for now
 }
+
+import { DEFAULT_PREFS, ViewPreferences } from '../components/ViewSettingsModal'; // Import types
 
 export default function ClientsList() {
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [viewPrefs, setViewPrefs] = useState<ViewPreferences>(DEFAULT_PREFS);
 
     useEffect(() => {
+        loadPrefs();
+        window.addEventListener('view-prefs-changed', loadPrefs);
         fetchClients();
+        return () => window.removeEventListener('view-prefs-changed', loadPrefs);
     }, []);
+
+    const loadPrefs = () => {
+        const stored = localStorage.getItem('psm_view_prefs');
+        if(stored) setViewPrefs(JSON.parse(stored));
+    };
 
     const fetchClients = async () => {
         try {
@@ -57,9 +69,38 @@ export default function ClientsList() {
         <div className="page-container">
             <div className="page-header-row">
                 <h1>Clients</h1>
-                <button className="btn-secondary active" onClick={() => setIsCreating(true)}>
-                    <Plus size={16} /> Add Client
-                </button>
+                <div style={{display:'flex', gap:'8px'}}>
+                    <button className="btn-secondary" onClick={() => document.getElementById('import-file')?.click()}>
+                        Simulate Import (Upload Excel)
+                    </button>
+                    <input 
+                        type="file" 
+                        id="import-file" 
+                        accept=".xlsx" 
+                        style={{display:'none'}} 
+                        onChange={async (e) => {
+                            if(e.target.files && e.target.files[0]) {
+                                const formData = new FormData();
+                                formData.append('file', e.target.files[0]);
+                                try {
+                                    const res = await fetch('/api/clients/import', { method: 'POST', body: formData });
+                                    if(res.ok) {
+                                        alert(await res.text());
+                                        fetchClients();
+                                    } else {
+                                        alert("Import failed: " + await res.text());
+                                    }
+                                } catch(err) {
+                                    console.error(err);
+                                    alert("Import Error");
+                                }
+                            }
+                        }}
+                    />
+                    <button className="btn-primary" onClick={() => setIsCreating(true)}>
+                        <Plus size={16} /> Add Client
+                    </button>
+                </div>
             </div>
 
             <div className="filter-bar card">
@@ -72,35 +113,50 @@ export default function ClientsList() {
 
 
             <div className="clients-list-view">
-                <div className="list-header">
+                <div className="list-header" style={{
+                    display:'grid', 
+                    gridTemplateColumns: `2fr ${viewPrefs.clients.showContact ? '1.5fr' : ''} ${viewPrefs.clients.showPhone ? '1.2fr' : ''} ${viewPrefs.clients.showJobs ? '1fr' : ''}`,
+                    gap: '16px'
+                }}>
                     <span>Company / Industry</span>
-                    <span>Contact Person</span>
-                    <span>Open Jobs</span>
-                    <span>Location</span>
+                    {viewPrefs.clients.showContact && <span>Contact Person</span>}
+                    {viewPrefs.clients.showPhone && <span>Phone</span>}
+                    {viewPrefs.clients.showJobs && <span>Open Jobs</span>}
                 </div>
                 {clients.map(client => (
-                    <Link to={`/clients/${client.id}`} key={client.id} className="client-row card">
+                    <Link to={`/clients/${client.id}`} key={client.id} className="client-row card" style={{
+                        display:'grid',
+                        gridTemplateColumns: `2fr ${viewPrefs.clients.showContact ? '1.5fr' : ''} ${viewPrefs.clients.showPhone ? '1.2fr' : ''} ${viewPrefs.clients.showJobs ? '1fr' : ''}`,
+                        gap: '16px',
+                        alignItems: 'center',
+                        textDecoration: 'none'
+                    }}>
                         <div className="client-main-info">
                             <div className="avatar">
                                 <Building2 size={24}/>
                             </div>
                             <div>
                                 <h3>{client.companyName}</h3>
-                                <p className="industry">{client.industry || 'Industry Not Set'}</p>
+                                {viewPrefs.clients.showIndustry && <p className="industry">{client.industry || 'Industry Not Set'}</p>}
                             </div>
                         </div>
-                        <div>
-                            <span style={{color: 'var(--text-primary)'}}>{client.contactPerson}</span>
-                        </div>
-                        <div>
-                             <span className={`status-pill ${client.jobOrders && client.jobOrders.length > 0 ? 'open-jobs' : 'no-jobs'}`}>
-                                {client.jobOrders ? client.jobOrders.length : 0} Open Jobs
-                            </span>
-                        </div>
-                        <div style={{color: 'var(--text-secondary)', fontSize: '0.9rem'}}>
-                            {/* Assuming city/state might optionally exist in client object, or fallback */}
-                           Location TBD
-                        </div>
+                        {viewPrefs.clients.showContact && (
+                            <div>
+                                <span style={{color: 'var(--text-primary)', fontWeight:'bold'}}>{client.contactPerson}</span>
+                            </div>
+                        )}
+                        {viewPrefs.clients.showPhone && (
+                            <div>
+                                <span style={{color: 'var(--primary-light)'}}>{client.phone || 'N/A'}</span>
+                            </div>
+                        )}
+                        {viewPrefs.clients.showJobs && (
+                            <div>
+                                <span className={`status-pill ${client.jobOrders && client.jobOrders.length > 0 ? 'open-jobs' : 'no-jobs'}`}>
+                                    {client.jobOrders ? client.jobOrders.length : 0} Open Jobs
+                                </span>
+                            </div>
+                        )}
                     </Link>
                 ))}
             </div>

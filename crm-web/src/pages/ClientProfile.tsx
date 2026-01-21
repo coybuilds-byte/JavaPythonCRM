@@ -4,7 +4,17 @@ import { Mail, Phone, MapPin, Plus, UserPlus, Calendar, Briefcase, FileText } fr
 import './ClientProfile.css';
 import JobOrderForm from '../components/JobOrderForm';
 import InterviewForm from '../components/InterviewForm';
+import ContactForm from '../components/ContactForm';
 import { useAuth } from '../context/AuthContext';
+
+interface ClientContact {
+    id: number;
+    name: string;
+    role?: string;
+    email?: string;
+    phone?: string;
+    notes?: string;
+}
 
 interface Client {
     id: number;
@@ -14,6 +24,9 @@ interface Client {
     phone: string;
     address: string;
     owner?: string;
+    logoUrl?: string; // New
+    sizzle?: string; // New
+    contacts?: ClientContact[]; // New
     jobOrders: any[];
 }
 
@@ -40,6 +53,12 @@ export default function ClientProfile() {
     // Feature States
     const [showJobForm, setShowJobForm] = useState(false);
     const [showInterviewForm, setShowInterviewForm] = useState(false);
+    const [editingSizzle, setEditingSizzle] = useState(false);
+    const [tempSizzle, setTempSizzle] = useState('');
+    
+    // Contact State
+    const [showContactForm, setShowContactForm] = useState(false);
+    const [editingContact, setEditingContact] = useState<any>(null);
     
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [selectedCandidate, setSelectedCandidate] = useState('');
@@ -59,7 +78,6 @@ export default function ClientProfile() {
     const fetchActivities = async () => {
         if (!id) return;
         try {
-            // Need to verify endpoint first, assuming /api/activities/client/{id} exists from controller view
             const res = await fetch(`/api/activities/client/${id}`);
             if (res.ok) {
                 const data = await res.json();
@@ -142,10 +160,18 @@ export default function ClientProfile() {
     const handleScheduleInterview = async (date: string, time: string, type: string, notes: string) => {
         try {
             const candidateName = candidates.find(c => c.id.toString() === selectedCandidate)?.name || 'Candidate';
+            const jobTitle = client!.jobOrders?.find((j: any) => j.id.toString() === selectedJob)?.title || 'Job';
+
+            // 1. Assign Candidate
+            await fetch(`/api/job-orders/${selectedJob}/candidates/${selectedCandidate}`, {
+                 method: 'POST',
+                 headers: {'Authorization': token || ''}
+            });
             
+            // 2. Log Interview Activity
             const activityPayload = {
                 type: 'INTERVIEW',
-                content: `Scheduled ${type} with ${candidateName} on ${date} at ${time}. Notes: ${notes}`,
+                content: `Scheduled ${type} with ${candidateName} for ${jobTitle} on ${date} at ${time}. Notes: ${notes}`,
                 client: { id: parseInt(id!) },
                 candidate: { id: parseInt(selectedCandidate) }
             };
@@ -159,18 +185,129 @@ export default function ClientProfile() {
                 body: JSON.stringify(activityPayload)
             });
 
-            if(res.ok) {
-                alert("Candidate Assigned & Interview Scheduled Successfully!");
-                setShowInterviewForm(false);
-                setSelectedCandidate('');
-                setSelectedJob('');
-            } else {
-                alert("Failed to save interview activity.");
-            }
+            if(!res.ok) throw new Error("Failed to save interview activity.");
+            
+            // 3. Send Emails (Automated)
+            await fetch('/api/email/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
+                body: JSON.stringify({
+                    to: user ? user.email : 'recruiter@precisionsourcemanagement.com', 
+                    subject: `Interview Confirmation: ${candidateName} for ${jobTitle}`,
+                    body: `Interview scheduled for ${date} at ${time}.\nCandidate: ${candidateName}\nType: ${type}\nNotes: ${notes}`
+                 })
+            });
+            
+            // 4. Schedule "Prep Call" (Day Prior)
+            const interviewDate = new Date(date);
+            const prepDate = new Date(interviewDate);
+            prepDate.setDate(prepDate.getDate() - 1);
+            const prepDateStr = prepDate.toISOString().split('T')[0];
+            
+            const prepPayload = {
+                 type: 'CALL',
+                 content: `PREP CALL for ${candidateName} (Interview on ${date}). Schedule for ${prepDateStr}.`,
+                 client: { id: parseInt(id!) },
+                 candidate: { id: parseInt(selectedCandidate) }
+            };
+             await fetch('/api/activities', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
+                body: JSON.stringify(prepPayload)
+            });
+
+
+            alert("Candidate Assigned, Interview Scheduled, Confirmation Sent, and Prep Call Task Logged!");
+            setShowInterviewForm(false);
+            setSelectedCandidate('');
+            setSelectedJob('');
+            fetchActivities();
+
         } catch(err) {
             console.error(err);
-            alert("Error scheduling interview.");
+            alert("Error scheduling interview workflow.");
         }
+    };
+
+    // Helper to get clean payload (exclude lists to avoid backend merge issues)
+    const getCleanClientPayload = (updates: Partial<Client>) => {
+        if(!client) return {};
+        const { jobOrders, contacts, ...cleanClient } = client;
+        return { ...cleanClient, ...updates };
+    };
+
+    // Use File Upload for Logo
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64String = reader.result as string;
+            
+            // Optimistic update
+            setClient(prev => prev ? ({ ...prev, logoUrl: base64String }) : null);
+
+            try {
+                const res = await fetch(`/api/clients/${id}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
+                    body: JSON.stringify(getCleanClientPayload({ logoUrl: base64String }))
+                });
+                if(res.ok) fetchClient();
+                else alert("Failed to save logo.");
+            } catch(err) { console.error(err); alert("Error saving logo"); }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const saveSizzle = async () => {
+         try {
+            // Optimistic update
+            setClient(prev => prev ? ({ ...prev, sizzle: tempSizzle }) : null);
+
+            await fetch(`/api/clients/${id}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
+                body: JSON.stringify(getCleanClientPayload({ sizzle: tempSizzle }))
+            });
+            setEditingSizzle(false);
+            fetchClient(); // Refresh to be sure
+        } catch(e) { console.error(e); }
+    }
+
+    const handleSaveContact = async (contactData: any) => {
+        try {
+            const isEdit = !!editingContact;
+            const url = isEdit ? `/api/contacts/${editingContact.id}` : '/api/contacts';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const payload = { ...contactData, client: { id: parseInt(id!) } };
+
+            const res = await fetch(url, {
+                method,
+                headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
+                body: JSON.stringify(payload)
+            });
+
+            if(res.ok) {
+                setShowContactForm(false);
+                fetchClient(); // Reload client to get updated contacts list
+            } else {
+                alert("Failed to save contact");
+            }
+        } catch(e) { console.error(e); alert("Error saving contact"); }
+    };
+
+    const handleDeleteContact = async (contactId: number) => {
+        if(!confirm("Are you sure you want to delete this contact?")) return;
+        try {
+            await fetch(`/api/contacts/${contactId}`, {
+                method: 'DELETE',
+                headers: {'Authorization': token || ''}
+            });
+            fetchClient();
+        } catch(e) { console.error(e); }
     };
 
     if(loading) return <div className="page-container">Loading...</div>;
@@ -184,10 +321,27 @@ export default function ClientProfile() {
                 <div className="card client-info-card">
                     <div className="card-header-simple">Client Info</div>
                     <div className="client-main-info">
-                         <div className="client-logo-placeholder">Logo</div>
+                         <div 
+                            className="client-logo-placeholder" 
+                            style={{
+                                position: 'relative',
+                                overflow: 'hidden',
+                                backgroundImage: client.logoUrl ? `url(${client.logoUrl})` : 'none', 
+                                backgroundSize:'cover',
+                                backgroundPosition:'center',
+                                display: 'flex', alignItems:'center', justifyContent:'center',
+                                color: client.logoUrl ? 'transparent' : 'white',
+                                border: '1px dashed var(--border)'
+                            }}
+                         >
+                            <label style={{cursor:'pointer', width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                                {client.logoUrl ? '' : 'Upload Logo'}
+                                <input type="file" accept="image/*" style={{display:'none'}} onChange={handleLogoUpload} />
+                            </label>
+                         </div>
                          <div className="client-text">
                              <h2>{client.companyName}</h2>
-                             <p className="contact-person">Contact: {client.contactPerson}</p>
+                             <p className="contact-person">Primary: {client.contactPerson}</p>
                              <div className="contact-row"><Mail size={14}/> {client.email}</div>
                              <div className="contact-row"><Phone size={14}/> {client.phone}</div>
                              <div className="contact-row"><MapPin size={14}/> {client.address}</div>
@@ -196,7 +350,70 @@ export default function ClientProfile() {
                              </div>
                          </div>
                     </div>
+                    {/* Sizzle Section */}
+                    <div style={{marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)'}}>
+                        <div style={{display:'flex', justifyContent:'space-between', marginBottom:'8px'}}>
+                            <strong style={{color:'#ffd700'}}>🔥 The Sizzle (Why work here?)</strong>
+                            {!editingSizzle ? (
+                                <button className="btn-text-small" onClick={() => { setTempSizzle(client.sizzle || ''); setEditingSizzle(true); }}>Edit</button>
+                            ) : (
+                                <div style={{display:'flex', gap:'8px'}}>
+                                    <button className="btn-text-small" onClick={saveSizzle}>Save</button>
+                                    <button className="btn-text-small" onClick={() => setEditingSizzle(false)} style={{color:'gray'}}>Cancel</button>
+                                </div>
+                            )}
+                        </div>
+                        {editingSizzle ? (
+                            <textarea 
+                                style={{...inputStyle, minHeight:'100px'}} 
+                                value={tempSizzle} 
+                                onChange={e => setTempSizzle(e.target.value)} 
+                                placeholder="Enter the selling points..."
+                            />
+                        ) : (
+                            <p style={{fontSize:'0.9rem', color: 'var(--text-secondary)', whiteSpace:'pre-wrap'}}>
+                                {client.sizzle || "No sizzle added yet. Click edit to add!"}
+                            </p>
+                        )}
+                    </div>
                 </div>
+
+                {/* Important Contacts List */}
+                <div className="card contacts-card" style={{marginTop:'16px'}}>
+                    <div className="card-header-simple" style={{display:'flex', justifyContent:'space-between'}}>
+                        <span>Important Contacts</span>
+                         <button className="btn-small" onClick={() => { setEditingContact(null); setShowContactForm(true); }}>+ Add</button>
+                    </div>
+                    {client.contacts && client.contacts.length > 0 ? (
+                        <div className="contacts-list">
+                            {client.contacts.map(c => (
+                                <div key={c.id} style={{padding:'10px', borderBottom:'1px solid var(--border)', fontSize:'0.9rem', position:'relative'}}>
+                                    <div style={{fontWeight:'bold'}}>{c.name} <span style={{fontWeight:'normal', color:'gray'}}>({c.role})</span></div>
+                                    <div style={{display:'flex', gap:'12px', marginTop:'4px', color:'var(--primary-light)'}}>
+                                        <span>{c.email}</span>
+                                        <span>{c.phone}</span>
+                                    </div>
+                                    {c.notes && <div style={{marginTop:'4px', fontStyle:'italic', color:'gray'}}>"{c.notes}"</div>}
+                                    
+                                    <div style={{position:'absolute', top:'10px', right:'10px', display:'flex', gap:'8px'}}>
+                                        <button className="btn-text-small" style={{color:'var(--text-secondary)'}} onClick={() => { setEditingContact(c); setShowContactForm(true); }}>Edit</button>
+                                        <button className="btn-text-small" style={{color:'red'}} onClick={() => handleDeleteContact(c.id)}>×</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div style={{padding:'16px', color:'gray', fontStyle:'italic'}}>No additional contacts.</div>
+                    )}
+                </div>
+
+                {showContactForm && (
+                    <ContactForm 
+                        initialData={editingContact}
+                        onSave={handleSaveContact}
+                        onCancel={() => setShowContactForm(false)}
+                    />
+                )}
 
                 {/* Communication Log */}
                 <div className="card communication-card">
@@ -230,7 +447,6 @@ export default function ClientProfile() {
                                     const body = (document.getElementById('email-body') as HTMLTextAreaElement).value;
                                     if(!subject || !body) return alert("Subject and Body required");
                                     
-                                    // 1. Send Email
                                     try {
                                         const res = await fetch('/api/email/send', {
                                             method: 'POST',
@@ -243,12 +459,6 @@ export default function ClientProfile() {
                                         });
                                         if(!res.ok) throw new Error("Failed to send");
                                         
-                                        // 2. Log Activity if sent
-                                        setNewActivityContent(`Sent Email: ${subject}`);
-                                        // Hacky: set active tab momentarily or just call helper
-                                        // We'll just manually call the log api here to reuse logic or just set state
-                                        // For now, let's just piggyback on handleAddActivity but we need to set content first
-                                        // Actually better to just duplicate the log call here for clarity
                                         await fetch('/api/activities', {
                                             method: 'POST',
                                             headers: {'Content-Type': 'application/json', 'Authorization': token || ''},

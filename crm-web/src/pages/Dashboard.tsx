@@ -3,42 +3,39 @@ import { Users, Briefcase, Calendar, TrendingUp, Search, Bell } from 'lucide-rea
 import './Dashboard.css';
 
 export default function Dashboard() {
-    const [stats, setStats] = useState({
+    const [stats, setStats] = useState<any>({
         activeCandidates: 0,
-        openJobs: 0,
-        interviews: 0
+        openJobOrders: 0,
+        interviewsScheduled: 0,
+        recentCandidates: [],
+        recentJobs: []
     });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [candidatesRes, jobsRes] = await Promise.all([
-                    fetch('/api/candidates'),
-                    fetch('/api/job-orders')
-                ]);
-                
-                if (candidatesRes.ok && jobsRes.ok) {
-                   const candidates = await candidatesRes.json();
-                   const jobs = await jobsRes.json();
-                   
-                   // Calculate Stats
-                   const activeCandidates = candidates.length; // Simply count all for now, or filter by status
-                   const openJobs = jobs.filter((j: any) => j.status === 'Open').length;
-                   // Mock interviews count logic or derive from status
-                   const interviewing = jobs.filter((j: any) => j.status === 'Interviewing').length;
-
-                   setStats({
-                       activeCandidates,
-                       openJobs,
-                       interviews: interviewing
-                   });
+                const res = await fetch('/api/dashboard');
+                if (res.ok) {
+                    const data = await res.json();
+                    setStats(data);
                 }
             } catch (error) {
                 console.error("Error loading dashboard stats", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchStats();
     }, []);
+
+    // Merge recent items for Activity Feed (Sort by ID/Date desc approximation)
+    const activities = [
+        ...stats.recentCandidates.map((c: any) => ({ type: 'candidate', date: c.id, text: `New candidate added: ${c.name} (${c.currentTitle || 'No Title'})` })),
+        ...stats.recentJobs.map((j: any) => ({ type: 'job', date: j.id, text: `New Job Order: ${j.title} for ${j.client?.companyName || 'Unknown Client'}` }))
+    ].sort((a, b) => b.date - a.date).slice(0, 10);
+
+    if (loading) return <div className="page-container">Loading Dashboard...</div>;
 
     return (
         <div className="dashboard-container">
@@ -49,23 +46,23 @@ export default function Dashboard() {
                     <div className="stat-value">{stats.activeCandidates}</div>
                     <div className="stat-change positive">
                         <Users size={16} />
-                        <span>+12% vs last month</span>
+                        <span>Total Database</span>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-header">Open Job Orders</div>
-                    <div className="stat-value">{stats.openJobs}</div>
+                    <div className="stat-value">{stats.openJobOrders}</div>
                     <div className="stat-change positive">
                         <Briefcase size={16} />
-                        <span>+5 new this week</span>
+                        <span>Currently Hiring</span>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-header">Interviews Scheduled</div>
-                    <div className="stat-value">{stats.interviews}</div>
+                    <div className="stat-value">{stats.interviewsScheduled}</div>
                     <div className="stat-change neutral">
                         <Calendar size={16} />
-                        <span>Same as yesterday</span>
+                        <span>Active Interviews</span>
                     </div>
                 </div>
             </div>
@@ -79,11 +76,11 @@ export default function Dashboard() {
                     {/* Candidate Management */}
                     <div className="section-card card">
                         <div className="section-header">
-                            <h3>Candidate Management</h3>
+                            <h3>Recent Candidates</h3>
                         </div>
                         <div className="search-bar">
-                            <Search size={16} className="search-icon" />
-                            <input type="text" placeholder="Search Candidates" />
+                             {/* Placeholder search logic could go here */}
+                             <div style={{color:'gray', fontSize:'0.9em'}}>Latest 5 entries</div>
                         </div>
                         <table className="mini-table">
                             <thead>
@@ -95,60 +92,43 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>John Doe</td>
-                                    <td>Marketing Specialist</td>
-                                    <td><span className="status-pill active">Active</span></td>
-                                    <td>New York</td>
-                                </tr>
-                                <tr>
-                                    <td>Jane Smith</td>
-                                    <td>Sales Planner</td>
-                                    <td><span className="status-pill active">Active</span></td>
-                                    <td>New York</td>
-                                </tr>
-                                <tr>
-                                    <td>Mike Johnson</td>
-                                    <td>Marketing Spg</td>
-                                    <td><span className="status-pill active">Active</span></td>
-                                    <td>San Fronds</td>
-                                </tr>
+                                {stats.recentCandidates.map((c: any) => (
+                                    <tr key={c.id}>
+                                        <td>{c.name}</td>
+                                        <td>{c.currentTitle}</td>
+                                        <td><span className={`status-pill ${c.status ? c.status.toLowerCase() : 'new'}`}>{c.status || 'New'}</span></td>
+                                        <td>{c.location || 'N/A'}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                         <div className="section-footer">
-                             <button className="btn-text">View All</button>
+                             <a href="/candidates" className="btn-text">View All</a>
                         </div>
                     </div>
 
                     {/* Client Management */}
                     <div className="section-card card">
                         <div className="section-header">
-                            <h3>Client Management</h3>
-                            <button className="btn-small">Add Job Order</button>
-                        </div>
-                        <div className="search-bar">
-                             <Search size={16} className="search-icon" />
-                            <input type="text" placeholder="Client Job Orders" />
+                            <h3>Recent Job Orders</h3>
+                            <a href="/job-orders" className="btn-small">View All</a>
                         </div>
                         <table className="mini-table">
                             <thead>
                                 <tr>
                                     <th>Job Title</th>
                                     <th>Status</th>
-                                    <th>Location</th>
+                                    <th>Positions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Sales Manager</td>
-                                    <td><span className="status-pill open">Open</span></td>
-                                    <td>New Angeles</td>
-                                </tr>
-                                <tr>
-                                    <td>Software Engineer</td>
-                                    <td><span className="status-pill in-progress">In Progress</span></td>
-                                    <td>Chicago</td>
-                                </tr>
+                                {stats.recentJobs.map((j: any) => (
+                                    <tr key={j.id}>
+                                        <td>{j.title}</td>
+                                        <td><span className={`status-pill ${j.status ? j.status.toLowerCase() : 'open'}`}>{j.status}</span></td>
+                                        <td>{j.openPositions || 1}</td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
@@ -160,36 +140,15 @@ export default function Dashboard() {
                     <div className="activity-card card">
                         <h3>Activity Feed</h3>
                         <ul className="feed-list">
-                            <li>
-                                <span className="bullet">■</span>
-                                <div className="feed-text">
-                                    <strong>Jane Smith</strong> had an interview with <strong>Client A</strong>.
-                                </div>
-                            </li>
-                            <li>
-                                <span className="bullet">■</span>
-                                <div className="feed-text">
-                                    New job order added: <strong>Sales Manager</strong>
-                                </div>
-                            </li>
-                            <li>
-                                <span className="bullet">■</span>
-                                <div className="feed-text">
-                                    <strong>Mike Johnson</strong> updated candidate profile.
-                                </div>
-                            </li>
-                            <li>
-                                <span className="bullet">■</span>
-                                <div className="feed-text">
-                                    Meeting scheduled with <strong>Client B</strong>.
-                                </div>
-                            </li>
-                             <li>
-                                <span className="bullet">■</span>
-                                <div className="feed-text">
-                                    <strong>Sarah Lee</strong> submitted a resume.
-                                </div>
-                            </li>
+                            {activities.map((act, i) => (
+                                <li key={i}>
+                                    <span className="bullet">■</span>
+                                    <div className="feed-text">
+                                        {act.text}
+                                    </div>
+                                </li>
+                            ))}
+                            {activities.length === 0 && <li style={{color:'gray'}}>No recent activity.</li>}
                         </ul>
                     </div>
                 </div>
@@ -214,7 +173,6 @@ export default function Dashboard() {
                     <div className="chart-placeholder">
                          <h4>Pipeline Overview</h4>
                          <div className="line-chart-mock">
-                            {/* Graphic handled by CSS or SVG later - placeholder for now */}
                             <svg viewBox="0 0 100 30" className="line-chart-svg">
                                 <polyline points="0,30 20,20 40,25 60,10 80,15 100,5" fill="none" stroke="var(--primary)" strokeWidth="2" />
                             </svg>

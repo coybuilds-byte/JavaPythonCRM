@@ -26,6 +26,9 @@ public class Client {
     private String city;
     private String state;
     private String zip;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String logoUrl;
 
     @OneToMany(mappedBy = "client")
@@ -56,6 +59,21 @@ public class Client {
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public List<JobOrder> getJobOrders() { return jobOrders; }
     public void setJobOrders(List<JobOrder> jobOrders) { this.jobOrders = jobOrders; }
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String sizzle;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonManagedReference
+    private List<ClientContact> contacts;
+
+    public String getSizzle() { return sizzle; }
+    public void setSizzle(String sizzle) { this.sizzle = sizzle; }
+
+    public List<ClientContact> getContacts() { return contacts; }
+    public void setContacts(List<ClientContact> contacts) { this.contacts = contacts; }
+
+    // Removed old flat contact fields if we migrate, but keeping for backward compat for now
     public String getOwner() { return owner; }
     public void setOwner(String owner) { this.owner = owner; }
 }

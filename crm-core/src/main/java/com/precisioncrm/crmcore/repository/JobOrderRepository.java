@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface JobOrderRepository extends JpaRepository<JobOrder, Long> {
     List<JobOrder> findByClientId(Long clientId);
+    long countByStatus(String status);
+    List<JobOrder> findTop5ByOrderByCreatedDateDesc();
 }

@@ -31,8 +31,7 @@
 }
 
 .list-header {
-    display: grid;
-    grid-template-columns: 2.5fr 1fr 1.5fr 1.5fr;
+    /* grid-template-columns defined inline in component */
     padding: 0 24px;
     margin-bottom: 4px;
     color: var(--text-secondary);
@@ -43,8 +42,7 @@
 }
 
 .candidate-row {
-    display: grid;
-    grid-template-columns: 2.5fr 1fr 1.5fr 1.5fr;
+    /* grid-template-columns defined inline in component */
     align-items: center;
     padding: 20px 24px;
     background: var(--surface);
