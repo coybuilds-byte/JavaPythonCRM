@@ -29,6 +29,11 @@ public class CandidateController {
         return candidateRepository.findAll();
     }
 
+    @GetMapping("/search")
+    public List<Candidate> search(@RequestParam("query") String query) {
+        return candidateRepository.searchCandidates(query);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Candidate> getById(@PathVariable Long id) {
         return candidateRepository.findById(id)
@@ -74,7 +79,7 @@ public class CandidateController {
     }
 
     @PostMapping("/parse")
-    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file, @RequestParam(value = "owner", required = false) String owner) {
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
@@ -101,6 +106,9 @@ public class CandidateController {
             candidate.setPhone(root.path("phone").asText());
             candidate.setAddress(root.path("address").asText());
             candidate.setCell(root.path("cell").asText());
+            if (root.has("current_title")) {
+                candidate.setCurrentTitle(root.path("current_title").asText());
+            }
             // Map skills
             if (root.has("skills")) {
                 java.util.List<String> skills = new java.util.ArrayList<>();
@@ -109,6 +117,9 @@ public class CandidateController {
             }
             candidate.setResumeText(root.path("text_content").asText());
             candidate.setStatus("New"); // Default status
+            if (owner != null && !owner.isEmpty()) {
+                candidate.setOwner(owner);
+            }
 
             Candidate savedCandidate = candidateRepository.save(candidate);
 

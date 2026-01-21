@@ -21,6 +21,7 @@ public class JobOrder {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("jobOrders")
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;

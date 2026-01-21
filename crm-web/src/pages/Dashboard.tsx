@@ -1,22 +1,72 @@
+import { useState, useEffect } from 'react';
+import { Users, Briefcase, Calendar, TrendingUp, Search, Bell } from 'lucide-react';
 import './Dashboard.css';
-import { Users, Briefcase, Calendar, Search, MapPin, MoreHorizontal } from 'lucide-react';
 
 export default function Dashboard() {
+    const [stats, setStats] = useState({
+        activeCandidates: 0,
+        openJobs: 0,
+        interviews: 0
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const [candidatesRes, jobsRes] = await Promise.all([
+                    fetch('/api/candidates'),
+                    fetch('/api/job-orders')
+                ]);
+                
+                if (candidatesRes.ok && jobsRes.ok) {
+                   const candidates = await candidatesRes.json();
+                   const jobs = await jobsRes.json();
+                   
+                   // Calculate Stats
+                   const activeCandidates = candidates.length; // Simply count all for now, or filter by status
+                   const openJobs = jobs.filter((j: any) => j.status === 'Open').length;
+                   // Mock interviews count logic or derive from status
+                   const interviewing = jobs.filter((j: any) => j.status === 'Interviewing').length;
+
+                   setStats({
+                       activeCandidates,
+                       openJobs,
+                       interviews: interviewing
+                   });
+                }
+            } catch (error) {
+                console.error("Error loading dashboard stats", error);
+            }
+        };
+        fetchStats();
+    }, []);
+
     return (
         <div className="dashboard-container">
             {/* Top Row: KPI Cards */}
             <div className="stats-grid">
                 <div className="stat-card">
                     <div className="stat-header">Active Candidates</div>
-                    <div className="stat-value">128</div>
+                    <div className="stat-value">{stats.activeCandidates}</div>
+                    <div className="stat-change positive">
+                        <Users size={16} />
+                        <span>+12% vs last month</span>
+                    </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-header">Open Job Orders</div>
-                    <div className="stat-value">34</div>
+                    <div className="stat-value">{stats.openJobs}</div>
+                    <div className="stat-change positive">
+                        <Briefcase size={16} />
+                        <span>+5 new this week</span>
+                    </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-header">Interviews Scheduled</div>
-                    <div className="stat-value">12</div>
+                    <div className="stat-value">{stats.interviews}</div>
+                    <div className="stat-change neutral">
+                        <Calendar size={16} />
+                        <span>Same as yesterday</span>
+                    </div>
                 </div>
             </div>
 

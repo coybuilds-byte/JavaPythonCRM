@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
 import './CandidateUpload.css' // We will create this or use styled components roughly
 
 interface ParsedResult {
@@ -14,6 +15,7 @@ interface CandidateUploadProps {
 }
 
 export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
+    const { token, user } = useAuth();
     const [file, setFile] = useState<File | null>(null)
     const [status, setStatus] = useState<string>('')
     const [result, setResult] = useState<ParsedResult | null>(null)

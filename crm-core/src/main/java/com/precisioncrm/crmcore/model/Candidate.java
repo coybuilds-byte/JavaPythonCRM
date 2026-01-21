@@ -15,6 +15,7 @@ public class Candidate {
     private String name;
     private String email;
     private String phone;
+    private String owner;
     
     // New Fields
     private String status; // e.g., 'Active', 'Placed', 'Interviewing'
@@ -66,4 +67,6 @@ public class Candidate {
     public void setResumeFilePath(String resumeFilePath) { this.resumeFilePath = resumeFilePath; }
     public List<JobOrder> getJobOrders() { return jobOrders; }
     public void setJobOrders(List<JobOrder> jobOrders) { this.jobOrders = jobOrders; }
+    public String getOwner() { return owner; }
+    public void setOwner(String owner) { this.owner = owner; }
 }

@@ -21,13 +21,13 @@ public class Client {
     private String phone;
 
     // New Fields
+    private String owner;
     private String address;
     private String city;
     private String state;
     private String zip;
     private String logoUrl;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "client")
     private List<JobOrder> jobOrders;
 
@@ -56,4 +56,6 @@ public class Client {
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
     public List<JobOrder> getJobOrders() { return jobOrders; }
     public void setJobOrders(List<JobOrder> jobOrders) { this.jobOrders = jobOrders; }
+    public String getOwner() { return owner; }
+    public void setOwner(String owner) { this.owner = owner; }
 }

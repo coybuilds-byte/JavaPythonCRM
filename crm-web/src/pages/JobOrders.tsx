@@ -2,27 +2,48 @@ import { useState, useEffect } from 'react';
 import { Plus, Filter, MoreHorizontal, MapPin } from 'lucide-react';
 import './JobOrders.css';
 
+interface Client {
+    id: number;
+    companyName: string;
+    city: string;
+    state: string;
+}
+
 interface JobOrder {
     id: number;
     title: string;
-    client: string;
-    location: string;
-    status: 'Open' | 'Interviewing' | 'Closed';
-    candidatesCount: number;
-    salary: string;
+    client: Client | null;
+    status: string;
+    candidates: any[];
+    description: string;
+    // salary: string; // Not in backend yet
 }
 
 export default function JobOrders() {
     const [jobs, setJobs] = useState<JobOrder[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Mock data
-        setJobs([
-            { id: 1, title: 'Senior Java Developer', client: 'TechCorp', location: 'Remote', status: 'Open', candidatesCount: 12, salary: '$140k - $160k' },
-            { id: 2, title: 'Product Manager', client: 'Global Finance', location: 'New York, NY', status: 'Interviewing', candidatesCount: 4, salary: '$120k - $140k' },
-            { id: 3, title: 'DevOps Engineer', client: 'HealthPlus', location: 'Austin, TX', status: 'Open', candidatesCount: 8, salary: '$130k' },
-        ]);
+        fetchJobs();
     }, []);
+
+    const fetchJobs = async () => {
+        try {
+            const res = await fetch('/api/job-orders');
+            if (!res.ok) throw new Error('Failed to fetch job orders');
+            const data = await res.json();
+            setJobs(data);
+        } catch (err) {
+            console.error(err);
+            setError('Could not load jobs');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) return <div className="page-container">Loading...</div>;
+    if (error) return <div className="page-container">{error}</div>;
 
     return (
         <div className="page-container">
@@ -43,27 +64,36 @@ export default function JobOrders() {
             </div>
 
             <div className="jobs-list">
-                {jobs.map(job => (
-                    <div key={job.id} className="job-card card">
-                        <div className="job-header">
-                            <div>
-                                <h3>{job.title}</h3>
-                                <p className="client-name">{job.client}</p>
+                {jobs.map(job => {
+                    // Derive location from client or default
+                    const location = job.client ? `${job.client.city}, ${job.client.state}` : 'Location TBD';
+                    // Count candidates
+                    const candidateCount = job.candidates ? job.candidates.length : 0;
+                    
+                    return (
+                        <div key={job.id} className="job-card card">
+                            <div className="job-header">
+                                <div>
+                                    <h3>{job.title}</h3>
+                                    <p className="client-name">{job.client?.companyName || 'No Client Assigned'}</p>
+                                </div>
+                                <button className="icon-btn"><MoreHorizontal size={20}/></button>
                             </div>
-                            <button className="icon-btn"><MoreHorizontal size={20}/></button>
-                        </div>
-                        
-                        <div className="job-details">
-                            <span className="location"><MapPin size={14}/> {job.location}</span>
-                            <span className="salary">{job.salary}</span>
-                        </div>
+                            
+                            <div className="job-details">
+                                <span className="location"><MapPin size={14}/> {location}</span>
+                                {/* Placeholder salary until backend has it */}
+                                <span className="salary">Salary TBD</span>
+                            </div>
 
-                        <div className="job-footer">
-                            <span className={`status-pill ${job.status.toLowerCase()}`}>{job.status}</span>
-                            <span className="candidate-count">{job.candidatesCount} Candidates</span>
+                            <div className="job-footer">
+                                <span className={`status-pill ${job.status ? job.status.toLowerCase() : 'open'}`}>{job.status || 'Open'}</span>
+                                <span className="candidate-count">{candidateCount} Candidates</span>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
+                {jobs.length === 0 && <div style={{padding: 20, textAlign: 'center'}}>No job orders found.</div>}
             </div>
         </div>
     );

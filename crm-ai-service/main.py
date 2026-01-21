@@ -15,6 +15,7 @@ class CandidateProfile(BaseModel):
     cell: Optional[str] = None
     address: Optional[str] = None
     skills: List[str] = []
+    current_title: Optional[str] = None
     text_content: Optional[str] = None
 
 def extract_text(file_content: bytes, filename: str) -> str:
@@ -89,6 +90,34 @@ def extract_skills(text: str):
             
     return list(set(found_skills))
 
+def extract_current_title(text: str):
+    # Simple heuristic: Look for common role keywords in the first section of text
+    # that might indicate the person's current or recent role.
+    common_roles = [
+        "Software Engineer", "Developer", "Manager", "Director", "VP", "Vice President",
+        "Analyst", "Consultant", "Administrator", "Coordinator", "Specialist", "Architect",
+        "Lead", "Chief", "Accountant", "Sales", "Representative", "Recruiter", "HR",
+        "Designer", "Product Owner", "Scrum Master", "Data Scientist", "DevOps",
+        "Controller", "Auditor", "Engineer"
+    ]
+    
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    
+    # Check lines 2-10 (assuming line 1 is name)
+    # We want a line that looks like a title (short-ish, contains a keyword)
+    search_lines = lines[1:15] if len(lines) > 15 else lines[1:]
+    
+    for line in search_lines:
+        if len(line.split()) > 10: # Skip long sentences
+            continue
+            
+        for role in common_roles:
+            if role.lower() in line.lower():
+                # Clean up the line a bit
+                return line.strip()
+                
+    return None
+
 @app.post("/parse-resume", response_model=CandidateProfile)
 async def parse_resume(file: UploadFile = File(...)):
     if not file.filename:
@@ -104,6 +133,7 @@ async def parse_resume(file: UploadFile = File(...)):
     email, phone, cell = extract_contact_info(text)
     address = extract_address(text)
     skills = extract_skills(text)
+    current_title = extract_current_title(text)
     
     return CandidateProfile(
         name=name,
@@ -112,6 +142,7 @@ async def parse_resume(file: UploadFile = File(...)):
         cell=cell,
         address=address,
         skills=skills,
+        current_title=current_title,
         text_content=text[:1000] # Truncated
     )
 

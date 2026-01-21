@@ -1,41 +1,61 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import CandidateProfile from './pages/CandidateProfile';
 import ClientProfile from './pages/ClientProfile';
 import Login from './components/Login';
-// import CandidateUpload from './components/CandidateUpload';
-import './App.css'; 
-
-// Placeholder pages
 import CandidatesList from './pages/CandidatesList';
 import ClientsList from './pages/ClientsList';
-
 import JobOrders from './pages/JobOrders';
 import Reports from './pages/Reports';
+import './App.css'; 
+
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    const { isAuthenticated } = useAuth();
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    return children;
+};
+
+// Wrapper specifically for Login to redirect if already authenticated
+const LoginRoute = () => {
+    const { isAuthenticated, login } = useAuth();
+    if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+    return <Login onLogin={login} />;
+};
+
+function AppContent() {
+    const { isAuthenticated } = useAuth();
+
+    return (
+        <div className="app-shell">
+            {isAuthenticated && <Navbar />}
+            <main className="main-content">
+                <Routes>
+                    <Route path="/login" element={<LoginRoute />} />
+                    
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                    
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/candidates" element={<ProtectedRoute><CandidatesList /></ProtectedRoute>} />
+                    <Route path="/candidates/:id" element={<ProtectedRoute><CandidateProfile /></ProtectedRoute>} />
+                    <Route path="/clients" element={<ProtectedRoute><ClientsList /></ProtectedRoute>} />
+                    <Route path="/clients/:id" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
+                    <Route path="/job-orders" element={<ProtectedRoute><JobOrders /></ProtectedRoute>} />
+                    <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+                </Routes>
+            </main>
+        </div>
+    );
+}
 
 function App() {
-  // Temporary Auth Check (Should be context)
-  const isAuthenticated = true; 
-
   return (
     <Router>
-      <div className="app-shell">
-        {isAuthenticated && <Navbar />}
-        <main className="main-content">
-            <Routes>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/login" element={<Login onLogin={() => {}} />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/candidates" element={<CandidatesList />} />
-                <Route path="/candidates/:id" element={<CandidateProfile />} />
-                <Route path="/clients" element={<ClientsList />} />
-                <Route path="/clients/:id" element={<ClientProfile />} />
-                <Route path="/job-orders" element={<JobOrders />} />
-                <Route path="/reports" element={<Reports />} />
-            </Routes>
-        </main>
-      </div>
+        <AuthProvider>
+            <AppContent />
+        </AuthProvider>
     </Router>
   );
 }

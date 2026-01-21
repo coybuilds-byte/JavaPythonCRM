@@ -21,19 +21,23 @@ export default function CandidateProfile() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Mock Data for layout dev
-        setCandidate({
-            id: 1,
-            name: 'John Doe',
-            email: 'john.doe@email.com',
-            phone: '555-123-4567',
-            status: 'Active',
-            location: 'New York, NY',
-            currentTitle: 'Senior Software Engineer',
-            skills: ['Java', 'React', 'Spring Boot', 'AWS'],
-            resumeText: `John Doe\nSenior Software Engineer\n\nEXPERIENCE\n\nLead Developer | TechCorp | 2020 - Present\n- Led a team of 5 developers...\n- Implemented microservices...\n\nSenior Engineer | Startup Inc | 2017 - 2020\n- Built MVP for...\n\nEDUCATION\nBS Computer Science | MIT`
-        });
-        setLoading(false);
+        const fetchCandidate = async () => {
+            if (!id) return;
+            try {
+                const res = await fetch(`/api/candidates/${id}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setCandidate(data);
+                } else {
+                    console.error('Failed to fetch candidate');
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCandidate();
     }, [id]);
 
     if (loading) return <div>Loading...</div>;

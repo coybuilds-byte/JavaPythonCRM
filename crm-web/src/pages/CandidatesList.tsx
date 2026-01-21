@@ -3,31 +3,57 @@ import { Link } from 'react-router-dom';
 import { Search, Filter, Plus } from 'lucide-react';
 import './CandidatesList.css';
 import CandidateUpload from '../components/CandidateUpload';
+import { useAuth } from '../context/AuthContext';
 
-interface CandidateSummary {
+interface Candidate {
     id: number;
     name: string;
-    title: string;
+    currentTitle: string; // Changed from title to match backend
     status: string;
     location: string;
-    address?: string; // New
-    cell?: string;    // New
+    address?: string;
+    cell?: string;
+    email: string;
+    phone: string;
 }
 
 export default function CandidatesList() {
     const [viewMode, setViewMode] = useState<'list' | 'upload'>('list');
-    const [candidates, setCandidates] = useState<CandidateSummary[]>([]);
+    const [candidates, setCandidates] = useState<Candidate[]>([]);
+    const [loading, setLoading] = useState(false);
+    
+    const { token } = useAuth();
+    const authHeader = token || '';
+ 
+
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        // Mock data for now, replace with fetch
-        setCandidates([
-            { id: 1, name: 'John Doe', title: 'Senior Software Engineer', status: 'Active', location: 'New York, NY', address: '123 Broadway, NY 10001', cell: '(555) 123-4455' },
-            { id: 2, name: 'Sarah Smith', title: 'Product Manager', status: 'Interviewing', location: 'San Francisco, CA', address: '456 Market St, SF 94105', cell: '(555) 987-6543' },
-            { id: 3, name: 'Mike Johnson', title: 'Sales Executive', status: 'Placed', location: 'Chicago, IL', address: '789 State St, IL 60601', cell: '(555) 555-1212' },
-        ]);
-    }, []);
+        const timer = setTimeout(() => {
+            if (viewMode === 'list') {
+                fetchCandidates();
+            }
+        }, 300); // Debounce search
+        return () => clearTimeout(timer);
+    }, [viewMode, searchQuery]);
 
-    // ... (Auth Header remains)
+    const fetchCandidates = async () => {
+        setLoading(true);
+        try {
+            const url = searchQuery 
+                ? `/api/candidates/search?query=${encodeURIComponent(searchQuery)}` 
+                : '/api/candidates';
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                setCandidates(data);
+            }
+        } catch (error) {
+            console.error('Error fetching candidates:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="page-container">
@@ -62,7 +88,12 @@ export default function CandidatesList() {
                     <div className="filter-bar card">
                         <div className="search-input">
                             <Search size={18} />
-                            <input type="text" placeholder="Search candidates..." />
+                            <input 
+                                type="text" 
+                                placeholder="Search candidates (skills, name, resume)..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
                         <div className="filters">
                             <button className="btn-filter"><Filter size={16} /> Status</button>
@@ -77,27 +108,28 @@ export default function CandidatesList() {
                             <span>Location</span>
                             <span>Contact</span>
                          </div>
-                        {candidates.map(candidate => (
+                        {loading ? <div style={{padding:20}}>Loading...</div> : candidates.map(candidate => (
                             <Link to={`/candidates/${candidate.id}`} key={candidate.id} className="candidate-row card">
                                 <div className="candidate-main-info">
-                                    <div className="avatar">{candidate.name.charAt(0)}</div>
+                                    <div className="avatar">{candidate.name ? candidate.name.charAt(0) : '?'}</div>
                                     <div>
                                         <h3>{candidate.name}</h3>
-                                        <p className="role">{candidate.title}</p>
+                                        <p className="role">{candidate.currentTitle || 'No Title'}</p>
                                     </div>
                                 </div>
                                 <div>
-                                    <span className={`status-pill ${candidate.status.toLowerCase()}`}>{candidate.status}</span>
+                                    <span className={`status-pill ${candidate.status ? candidate.status.toLowerCase() : 'new'}`}>{candidate.status || 'New'}</span>
                                 </div>
                                 <div className="location-info">
                                     <span>{candidate.location}</span>
                                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{candidate.address}</span>
                                 </div>
                                 <div className="contact-info-col">
-                                    <span>{candidate.cell || 'No Cell'}</span>
+                                    <span>{candidate.cell || candidate.phone || 'No Contact'}</span>
                                 </div>
                             </Link>
                         ))}
+                        {!loading && candidates.length === 0 && <div style={{padding:20, textAlign:'center'}}>No candidates found. Upload a resume to get started.</div>}
                     </div>
                 </>
             )}
