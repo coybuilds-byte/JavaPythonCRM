@@ -19,6 +19,9 @@ public class ClientController {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.NotificationService notificationService;
+
     @GetMapping
     public List<Client> getAll() {
         return clientRepository.findAll();
@@ -78,7 +81,9 @@ public class ClientController {
         if (principal != null) {
             client.setOwner(principal.getName());
         }
-        return clientRepository.save(client);
+        Client saved = clientRepository.save(client);
+        notificationService.createNotification("SYSTEM", "New client added: " + saved.getCompanyName(), "CLIENT", saved.getId());
+        return saved;
     }
 
     @PutMapping("/{id}")

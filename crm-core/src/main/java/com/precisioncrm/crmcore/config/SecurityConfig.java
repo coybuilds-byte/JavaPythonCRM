@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/public/**", "/api/candidates/parse").permitAll()
+                        .requestMatchers("/api/notifications/**").authenticated() // Explicitly showing intent, though anyRequest covers it
                         .anyRequest().authenticated()
                 )
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable Basic Auth

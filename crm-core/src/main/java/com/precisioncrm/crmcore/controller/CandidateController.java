@@ -21,6 +21,9 @@ public class CandidateController {
     @Autowired
     private CandidateRepository candidateRepository;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.NotificationService notificationService;
+
     @Value("${AI_SERVICE_URL:http://localhost:8000}")
     private String aiServiceUrl;
 
@@ -46,7 +49,9 @@ public class CandidateController {
         if (principal != null) {
             candidate.setOwner(principal.getName());
         }
-        return candidateRepository.save(candidate);
+        Candidate saved = candidateRepository.save(candidate);
+        notificationService.createNotification("SYSTEM", "New candidate added: " + saved.getName(), "CANDIDATE", saved.getId());
+        return saved;
     }
 
     @PutMapping("/{id}")
@@ -140,6 +145,7 @@ public class CandidateController {
             }
 
             Candidate savedCandidate = candidateRepository.save(candidate);
+            notificationService.createNotification("SYSTEM", "New candidate parsed: " + savedCandidate.getName(), "CANDIDATE", savedCandidate.getId());
 
             return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {

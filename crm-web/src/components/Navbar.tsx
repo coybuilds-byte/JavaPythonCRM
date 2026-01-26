@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Users, Briefcase, FileText, Settings, Search, Bell, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ViewSettingsModal from './ViewSettingsModal';
+import NotificationDropdown from './NotificationDropdown';
+import BroadcastModal from './BroadcastModal';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -10,6 +12,7 @@ export default function Navbar() {
   const { logout, user } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
 
   const isActive = (path: string) => location.pathname.startsWith(path) ? 'active' : '';
 
@@ -49,7 +52,7 @@ export default function Navbar() {
             <Search size={16} />
             <input type="text" placeholder="Search..." />
         </div>
-        <button className="icon-btn"><Bell size={20} /></button>
+        <NotificationDropdown onOpenBroadcast={() => setShowBroadcast(true)} />
         
         <div style={{position:'relative'}}>
             <button className="icon-btn" onClick={() => setShowMenu(!showMenu)}><Settings size={20} /></button>
@@ -82,6 +85,7 @@ export default function Navbar() {
       </div>
     </nav>
     {showSettings && <ViewSettingsModal onClose={() => setShowSettings(false)} onSave={() => window.dispatchEvent(new Event('view-prefs-changed'))} />}
+    {showBroadcast && <BroadcastModal onClose={() => setShowBroadcast(false)} />}
     </>
   );
 }

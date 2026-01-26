@@ -15,6 +15,9 @@ public class JobOrderController {
     @Autowired
     private JobOrderRepository jobOrderRepository;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.NotificationService notificationService;
+
     @GetMapping
     public List<JobOrder> getAll() {
         return jobOrderRepository.findAll();
@@ -42,7 +45,9 @@ public class JobOrderController {
             if(client == null) return ResponseEntity.badRequest().body("Client not found");
             jobOrder.setClient(client);
         }
-        return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
+        JobOrder saved = jobOrderRepository.save(jobOrder);
+        notificationService.createNotification("SYSTEM", "New Job Order: " + saved.getTitle() + " for " + (saved.getClient() != null ? saved.getClient().getCompanyName() : "Unknown Client"), "JOB", saved.getId());
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
