@@ -26,6 +26,10 @@ services:
     env: static
     buildCommand: cd crm-web && npm install && npm run build
     staticPublishPath: crm-web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
         value: https://crm-backend.onrender.com # Helper to auto-update may be needed
