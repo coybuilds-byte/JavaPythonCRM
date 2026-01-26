@@ -32,4 +32,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://crm-backend.onrender.com # Helper to auto-update may be needed
+        value: https://crm-backend-ctja.onrender.com
