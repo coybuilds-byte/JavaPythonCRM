@@ -1,6 +1,6 @@
 import { useState } from 'react'; // Added useState
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, Briefcase, FileText, Settings, Search, Bell, User, LogOut } from 'lucide-react';
+import { Home, Users, Briefcase, FileText, Settings, Search, Bell, User, LogOut, ExternalLink, Linkedin, Facebook } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ViewSettingsModal from './ViewSettingsModal';
 import NotificationDropdown from './NotificationDropdown';
@@ -68,6 +68,21 @@ export default function Navbar() {
                     >
                         <Settings size={14}/> View Settings
                     </div>
+                    
+                    <div style={{height:'1px', background:'var(--border)', margin:'4px 0'}}></div>
+                    
+                    <a href="https://www.precisionsourcemanagement.com" target="_blank" rel="noopener noreferrer" className="dropdown-item" style={{padding:'8px', display:'flex', alignItems:'center', gap:'8px', color:'var(--text-primary)', textDecoration:'none'}}>
+                        <ExternalLink size={14}/> Website
+                    </a>
+                    <a href="https://www.linkedin.com/company/precisionsourcemanagement" target="_blank" rel="noopener noreferrer" className="dropdown-item" style={{padding:'8px', display:'flex', alignItems:'center', gap:'8px', color:'var(--text-primary)', textDecoration:'none'}}>
+                        <Linkedin size={14}/> LinkedIn
+                    </a>
+                    <a href="https://www.facebook.com/precisionsourcemanagement" target="_blank" rel="noopener noreferrer" className="dropdown-item" style={{padding:'8px', display:'flex', alignItems:'center', gap:'8px', color:'var(--text-primary)', textDecoration:'none'}}>
+                        <Facebook size={14}/> Facebook
+                    </a>
+
+                    <div style={{height:'1px', background:'var(--border)', margin:'4px 0'}}></div>
+
                     <div style={{padding:'8px', cursor:'pointer', display:'flex', alignItems:'center', gap:'8px', color:'#ff6b6b'}} 
                          className="dropdown-item"
                          onClick={handleLogout}
