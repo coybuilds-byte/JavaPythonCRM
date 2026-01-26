@@ -4,6 +4,7 @@ import { Search, Filter, Plus } from 'lucide-react';
 import './CandidatesList.css';
 import CandidateUpload from '../components/CandidateUpload';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 interface Candidate {
     id: number;
@@ -43,9 +44,11 @@ export default function CandidatesList() {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch(`http://localhost:8000/search-candidates?query=${encodeURIComponent(queryToSearch)}`);
+            // Proxy through our own backend (using unified base URL)
+            const res = await fetch(`${API_BASE_URL}/api/candidates/web-search?query=${encodeURIComponent(queryToSearch)}`);
             if (res.ok) {
                  const d = await res.json();
+                 // The python service returns {"results": [...]}, and our Java proxy returns that body directly.
                  const results = d.results || [];
                  setCandidates(results.map((r: any, i: number) => ({
                      id: -i - 1, // negative ID for external
@@ -74,9 +77,9 @@ export default function CandidatesList() {
         setError('');
         try {
             const url = searchQuery 
-                ? `/api/candidates/search?query=${encodeURIComponent(searchQuery)}` 
-                : '/api/candidates';
-            const res = await fetch(url);
+                ? `${API_BASE_URL}/api/candidates/search?query=${encodeURIComponent(searchQuery)}` 
+                : `${API_BASE_URL}/api/candidates`;
+            const res = await fetch(url, { headers: { 'Authorization': authHeader || '' } });
             if (res.ok) {
                 const data = await res.json();
                 setCandidates(data);

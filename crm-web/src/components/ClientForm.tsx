@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 interface ClientFormProps {
     onSuccess: () => void;
@@ -27,7 +28,7 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
         setError('');
 
         try {
-            const res = await fetch('/api/clients', {
+            const res = await fetch(`${API_BASE_URL}/api/clients`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

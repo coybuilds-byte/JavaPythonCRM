@@ -6,6 +6,7 @@ import JobOrderForm from '../components/JobOrderForm';
 import InterviewForm from '../components/InterviewForm';
 import ContactForm from '../components/ContactForm';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 interface ClientContact {
     id: number;
@@ -78,7 +79,9 @@ export default function ClientProfile() {
     const fetchActivities = async () => {
         if (!id) return;
         try {
-            const res = await fetch(`/api/activities/client/${id}`);
+            const res = await fetch(`${API_BASE_URL}/api/activities/client/${id}`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setActivities(data);
@@ -98,7 +101,7 @@ export default function ClientProfile() {
                 client: { id: parseInt(id!) }
             };
 
-            const res = await fetch('/api/activities', {
+            const res = await fetch(`${API_BASE_URL}/api/activities`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -120,7 +123,9 @@ export default function ClientProfile() {
     const fetchClient = async () => {
          if (!id) return;
          try {
-             const res = await fetch(`/api/clients/${id}`);
+             const res = await fetch(`${API_BASE_URL}/api/clients/${id}`, {
+                 headers: { 'Authorization': token || '' }
+             });
              if (res.ok) {
                  const data = await res.json();
                  setClient(data);
@@ -134,7 +139,9 @@ export default function ClientProfile() {
 
     const fetchCandidates = async () => {
         try {
-            const res = await fetch('/api/candidates');
+            const res = await fetch(`${API_BASE_URL}/api/candidates`, {
+                headers: { 'Authorization': token || '' }
+            });
             if(res.ok) {
                 const data = await res.json();
                 setCandidates(data);
@@ -163,7 +170,7 @@ export default function ClientProfile() {
             const jobTitle = client!.jobOrders?.find((j: any) => j.id.toString() === selectedJob)?.title || 'Job';
 
             // 1. Assign Candidate
-            await fetch(`/api/job-orders/${selectedJob}/candidates/${selectedCandidate}`, {
+            await fetch(`${API_BASE_URL}/api/job-orders/${selectedJob}/candidates/${selectedCandidate}`, {
                  method: 'POST',
                  headers: {'Authorization': token || ''}
             });
@@ -188,7 +195,7 @@ export default function ClientProfile() {
             if(!res.ok) throw new Error("Failed to save interview activity.");
             
             // 3. Send Emails (Automated)
-            await fetch('/api/email/send', {
+            await fetch(`${API_BASE_URL}/api/email/send`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                 body: JSON.stringify({
@@ -210,7 +217,7 @@ export default function ClientProfile() {
                  client: { id: parseInt(id!) },
                  candidate: { id: parseInt(selectedCandidate) }
             };
-             await fetch('/api/activities', {
+             await fetch(`${API_BASE_URL}/api/activities`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                 body: JSON.stringify(prepPayload)
@@ -249,7 +256,7 @@ export default function ClientProfile() {
             setClient(prev => prev ? ({ ...prev, logoUrl: base64String }) : null);
 
             try {
-                const res = await fetch(`/api/clients/${id}`, {
+                const res = await fetch(`${API_BASE_URL}/api/clients/${id}`, {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                     body: JSON.stringify(getCleanClientPayload({ logoUrl: base64String }))
@@ -266,7 +273,7 @@ export default function ClientProfile() {
             // Optimistic update
             setClient(prev => prev ? ({ ...prev, sizzle: tempSizzle }) : null);
 
-            await fetch(`/api/clients/${id}`, {
+            await fetch(`${API_BASE_URL}/api/clients/${id}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                 body: JSON.stringify(getCleanClientPayload({ sizzle: tempSizzle }))
@@ -279,7 +286,7 @@ export default function ClientProfile() {
     const handleSaveContact = async (contactData: any) => {
         try {
             const isEdit = !!editingContact;
-            const url = isEdit ? `/api/contacts/${editingContact.id}` : '/api/contacts';
+            const url = isEdit ? `${API_BASE_URL}/api/contacts/${editingContact.id}` : `${API_BASE_URL}/api/contacts`;
             const method = isEdit ? 'PUT' : 'POST';
             
             const payload = { ...contactData, client: { id: parseInt(id!) } };
@@ -302,7 +309,7 @@ export default function ClientProfile() {
     const handleDeleteContact = async (contactId: number) => {
         if(!confirm("Are you sure you want to delete this contact?")) return;
         try {
-            await fetch(`/api/contacts/${contactId}`, {
+            await fetch(`${API_BASE_URL}/api/contacts/${contactId}`, {
                 method: 'DELETE',
                 headers: {'Authorization': token || ''}
             });
@@ -448,7 +455,7 @@ export default function ClientProfile() {
                                     if(!subject || !body) return alert("Subject and Body required");
                                     
                                     try {
-                                        const res = await fetch('/api/email/send', {
+                                        const res = await fetch(`${API_BASE_URL}/api/email/send`, {
                                             method: 'POST',
                                             headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                                             body: JSON.stringify({
@@ -459,7 +466,7 @@ export default function ClientProfile() {
                                         });
                                         if(!res.ok) throw new Error("Failed to send");
                                         
-                                        await fetch('/api/activities', {
+                                        await fetch(`${API_BASE_URL}/api/activities`, {
                                             method: 'POST',
                                             headers: {'Content-Type': 'application/json', 'Authorization': token || ''},
                                             body: JSON.stringify({

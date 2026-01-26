@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Search, Plus, Building2 } from 'lucide-react';
 import './ClientsList.css';
@@ -14,8 +15,10 @@ interface Client {
 }
 
 import { DEFAULT_PREFS, type ViewPreferences } from '../components/ViewSettingsModal'; // Import types
+import { API_BASE_URL } from '../config';
 
 export default function ClientsList() {
+    const { token } = useAuth();
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -36,7 +39,9 @@ export default function ClientsList() {
 
     const fetchClients = async () => {
         try {
-            const res = await fetch('/api/clients');
+            const res = await fetch(`${API_BASE_URL}/api/clients`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (!res.ok) throw new Error('Failed to fetch clients');
             const data = await res.json();
             setClients(data);
@@ -83,7 +88,11 @@ export default function ClientsList() {
                                 const formData = new FormData();
                                 formData.append('file', e.target.files[0]);
                                 try {
-                                    const res = await fetch('/api/clients/import', { method: 'POST', body: formData });
+                                    const res = await fetch(`${API_BASE_URL}/api/clients/import`, { 
+                                        method: 'POST', 
+                                        headers: { 'Authorization': token || '' },
+                                        body: formData 
+                                    });
                                     if(res.ok) {
                                         alert(await res.text());
                                         fetchClients();

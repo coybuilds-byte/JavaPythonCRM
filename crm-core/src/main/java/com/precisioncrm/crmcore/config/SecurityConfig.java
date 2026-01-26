@@ -34,7 +34,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(java.util.Arrays.asList(
             "http://localhost:5173", 
             "https://crm-frontend.onrender.com", 
-            "https://www.psmtechstaffing.com"
+            "https://www.psmtechstaffing.com",
+            "https://psmtechstaffing.com"
         ));
         configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));

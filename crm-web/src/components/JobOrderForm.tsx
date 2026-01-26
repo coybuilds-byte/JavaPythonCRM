@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 
 interface JobOrderFormProps {
     clientId: number;
@@ -25,7 +26,7 @@ export default function JobOrderForm({ clientId, onSuccess, onCancel }: JobOrder
         setError('');
 
         try {
-            const res = await fetch('/api/job-orders', {
+            const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

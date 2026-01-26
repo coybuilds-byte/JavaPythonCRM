@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE_URL } from '../config'
 import { useAuth } from '../context/AuthContext'
 import './CandidateUpload.css' // We will create this or use styled components roughly
 
@@ -57,8 +58,8 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
         formData.append('file', file)
 
         try {
-            // Use relative path which is proxied by Vite
-            const response = await fetch(`/api/candidates/parse`, {
+            // Use centralized URL
+            const response = await fetch(`${API_BASE_URL}/api/candidates/parse`, {
                 method: 'POST',
                 headers: {
                     'Authorization': authHeader

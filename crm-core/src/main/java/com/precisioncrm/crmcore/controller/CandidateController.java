@@ -147,4 +147,15 @@ public class CandidateController {
             return ResponseEntity.status(500).build();
         }
     }
+    @GetMapping("/web-search")
+    public ResponseEntity<?> webSearch(@RequestParam("query") String query) {
+        try {
+            String url = aiServiceUrl + "/search-candidates?query=" + query;
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error connecting to AI Search Service");
+        }
+    }
 }

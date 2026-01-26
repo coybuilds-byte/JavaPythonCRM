@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE_URL } from '../config'
 import '../index.css'
 // @ts-ignore
 import psmLogo from '../assets/psm-logo.jpg'
@@ -26,7 +27,8 @@ export default function Login({ onLogin }: LoginProps) {
         // Normalize email to lowercase to match backend case-insensitivity preference
         const normalizedEmail = email.toLowerCase()
         const auth = 'Basic ' + btoa(normalizedEmail + ':' + password)
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
+        // Use centralized API URL
+        const apiUrl = API_BASE_URL
 
         try {
             // Verify credentials by hitting a protected endpoint
