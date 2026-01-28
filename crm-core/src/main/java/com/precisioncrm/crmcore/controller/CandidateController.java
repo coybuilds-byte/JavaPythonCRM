@@ -101,7 +101,7 @@ public class CandidateController {
     }
 
     @PostMapping("/parse")
-    public ResponseEntity<Candidate> parseResume(@RequestParam("file") MultipartFile file, java.security.Principal principal) {
+    public ResponseEntity<?> parseResume(@RequestParam("file") MultipartFile file, java.security.Principal principal) {
         String owner = (principal != null) ? principal.getName() : null;
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
@@ -150,7 +150,7 @@ public class CandidateController {
             return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body("Error parsing resume: " + e.getMessage());
         }
     }
     @GetMapping("/web-search")
