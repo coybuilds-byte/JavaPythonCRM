@@ -67,8 +67,8 @@ This repository includes pre-configured settings in `.antigravity/settings.json`
 - **Code Formatting**: Auto-formatting on save with Prettier for JS/TS files
 - **Auto-save**: Files are automatically saved after 1 second of inactivity
 - **Java Settings**: Automatic build configuration updates
-- **Python Settings**: Pre-configured virtual environment path
-- **Terminal**: Default PowerShell on Windows, bash on Linux/Mac
+- **Python Settings**: Pre-configured virtual environment path (Windows default; Linux/Mac users may need to change to `.venv/bin/python`)
+- **Terminal**: Default PowerShell on Windows, zsh on macOS, bash on Linux
 
 ## Running the Services
 
@@ -76,7 +76,7 @@ Once you have the workspace open in Antigravity:
 
 ### 1. Python AI Service (Backend)
 
-Open a new terminal in Antigravity (`Ctrl+` ` or Terminal > New Terminal):
+Open a new terminal in Antigravity (``Ctrl+` `` or Terminal > New Terminal):
 
 ```bash
 cd crm-ai-service

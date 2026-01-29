@@ -7,9 +7,10 @@
   "files.autoSaveDelay": 1000,
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.osx": "zsh",
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "automatic",
-  "python.defaultInterpreterPath": "${workspaceFolder}/crm-ai-service/.venv/bin/python",
+  "python.defaultInterpreterPath": "${workspaceFolder}/crm-ai-service/.venv/Scripts/python.exe",
   "python.analysis.typeCheckingMode": "basic",
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
