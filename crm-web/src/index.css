@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Brand Colors (Precision Source Management) */
+    --primary-dark: #0c1a32;   /* Main Background - Deep Navy */
+    --primary: #f7b500;        /* Gold/Yellow - Primary Actions */
+    --primary-hover: #e0a800;  /* Darker Gold */
+    --accent: #87ceeb;         /* Sky Blue - AI/Tech Accent */
+    
+    /* Surface Colors */
+    --bg-color: #0c1a32;       /* Matching Primary Dark */
+    --surface: #152342;        /* Slightly lighter Navy for Cards */
+    --surface-hover: #1e3a8a;  /* Blue tint on hover */
+    
+    /* Text Colors */
+    --text-main: #ffffff;      /* Pure White */
+    --text-secondary: #cbd5e1; /* Light Slate */
+    --border: #2d3f5e;         /* Nav/Card Borders */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: var(--text-main); /* Ensure headers are white */
+}
+
+a {
+    color: var(--primary-light);
+    text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+}
+
+/* Global Card Style (Dark Theme) */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    color: var(--text-main);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+/* Button Styles */
+.btn-primary {
+    background: var(--primary); /* Gold */
+    color: #000000;             /* Black text on Gold */
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;         /* Slightly sharper corners for modern look */
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Secondary Button (Dark Mode) */
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05); /* Subtle white tint */
+    border-color: var(--text-main);
+}
+
+.btn-secondary.active {
+    background: rgba(247, 181, 0, 0.1); /* Gold tint */
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Inputs (Dark Mode) */
+input[type="text"], input[type="file"] {
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-light);
+}

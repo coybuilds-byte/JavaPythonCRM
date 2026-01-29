@@ -1,0 +1,35 @@
+services:
+  # Backend Service
+  - type: web
+    name: crm-backend
+    env: docker
+    dockerContext: ./crm-core
+    dockerfilePath: ./crm-core/Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: AI_SERVICE_URL
+        value: http://crm-ai-service
+    plan: free
+
+  # AI Service
+  - type: web
+    name: crm-ai-service
+    env: docker
+    dockerContext: ./crm-ai-service
+    dockerfilePath: ./crm-ai-service/Dockerfile
+    plan: free
+
+  # Frontend (Static Site)
+  - type: web
+    name: crm-frontend
+    env: static
+    buildCommand: cd crm-web && npm install && npm run build
+    staticPublishPath: crm-web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://crm-backend-ctja.onrender.com

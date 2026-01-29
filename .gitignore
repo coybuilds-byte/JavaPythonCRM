@@ -1,0 +1,8 @@
+target/
+.venv/
+node_modules/
+.idea/
+*.iml
+crm-core/data/
+.env
+crm-web/.env

@@ -1,0 +1,13 @@
+
+> crm-web@0.0.0 build
+> tsc -b && vite build
+
+src/App.tsx(15,51): error TS2503: Cannot find namespace 'JSX'.
+src/components/ViewSettingsModal.tsx(61,27): error TS7053: Element implicitly has an 'any' type because expression of type '"showIndustry" | "showContact" | "showPhone" | "showJobs"' can't be used to index type '{ showIndustry: boolean; showContact: boolean; showPhone: boolean; showJobs: boolean; } | { showTitle: boolean; showSkills: boolean; showStatus: boolean; }'.
+  Property 'showIndustry' does not exist on type '{ showIndustry: boolean; showContact: boolean; showPhone: boolean; showJobs: boolean; } | { showTitle: boolean; showSkills: boolean; showStatus: boolean; }'.
+src/context/AuthContext.tsx(1,65): error TS1484: 'ReactNode' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/CandidatesList.tsx(20,25): error TS1484: 'ViewPreferences' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/ClientProfile.tsx(195,37): error TS2339: Property 'email' does not exist on type 'string'.
+src/pages/ClientsList.tsx(16,25): error TS1484: 'ViewPreferences' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/JobOrders.tsx(96,27): error TS2345: Argument of type '{ title: string; clientId: string; description: string; status: string; }' is not assignable to parameter of type 'SetStateAction<{ title: string; clientId: string; description: string; status: string; sizzle: string; }>'.
+  Property 'sizzle' is missing in type '{ title: string; clientId: string; description: string; status: string; }' but required in type '{ title: string; clientId: string; description: string; status: string; sizzle: string; }'.

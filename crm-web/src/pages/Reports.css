@@ -1,0 +1,80 @@
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+}
+
+.report-card {
+    padding: 24px;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.chart-placeholder {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+}
+
+.bar {
+    flex: 1;
+    background: var(--surface-hover);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.5s ease;
+}
+
+.bar.active {
+    background: var(--primary);
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.pipeline-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.pipeline-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pipeline-item .label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.progress-bg {
+    height: 8px;
+    background: var(--bg-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+}

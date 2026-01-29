@@ -1,0 +1,197 @@
+/* Main Container */
+.client-profile-container {
+    padding: 32px;
+    max-width: 1600px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 400px 1fr; /* Info on Left, Content on Right */
+    gap: 24px;
+}
+
+.client-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.client-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Card Headers */
+.card-header-simple {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+/* Left: Client Info */
+.client-info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.client-main-info {
+    display: flex;
+    flex-direction: column; /* Stacked logo usually in wireframes, keeping flex row if preferred but wireframe looked like top block */
+    gap: 16px;
+}
+
+.client-logo-placeholder {
+    width: 100%;
+    height: 120px;
+    background: var(--bg-color);
+    border: 1px solid var(--border); 
+    /* Cross diagonal lines simulation in CSS is complex, stick to box */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 12px;
+    position: relative;
+    /* Simulate 'X' */
+    background: linear-gradient(to top right, transparent calc(50% - 1px), var(--border) 50%, transparent calc(50% + 1px) ), 
+                linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border) 50%, transparent calc(50% + 1px) );
+}
+
+.client-text h2 {
+    font-size: 1.25rem;
+    margin: 0 0 8px 0;
+    color: var(--text-main);
+}
+
+.contact-person {
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Middle: Job Orders Table */
+.job-orders-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.job-table-clean {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.job-table-clean th {
+    text-align: left;
+    padding: 8px;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    background: var(--bg-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.job-table-clean td {
+    padding: 8px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.btn-block-dashed {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--text-secondary);
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.btn-block-dashed:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Right: Assignment */
+.assignment-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.assignment-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.candidate-select {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    border-radius: 4px;
+}
+
+.drag-drop-area-small {
+    border: 2px dashed var(--border);
+    padding: 20px;
+    text-align: center;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.02);
+    border-radius: 4px;
+}
+
+.helper-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Comms Log - Reusing mostly but adjusting for left column */
+.communication-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    flex: 1; /* Fill remaining space if needed */
+}
+
+/* Timeline */
+.timeline-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.timeline-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--border); /* Grey dot as per wireframe */
+    border-radius: 50%;
+    margin-top: 4px;
+    /* Optional: Custom icons inside dot or different colors */
+}
+
+@media (max-width: 1024px) {
+    .client-profile-container { grid-template-columns: 1fr; }
+}
