@@ -4,7 +4,7 @@ A 3-tier recruitment CRM with AI capabilities.
 
 ## Clone Repository
 
-To clone this repository in your code editor (including Antigravity), use one of the following commands:
+To clone this repository to work with in your code editor, run one of these commands in your terminal:
 
 **HTTPS:**
 ```bash
