@@ -2,6 +2,20 @@
 
 A 3-tier recruitment CRM with AI capabilities.
 
+## Clone Repository
+
+To clone this repository in your code editor (including Antigravity), use one of the following commands:
+
+**HTTPS:**
+```bash
+git clone https://github.com/coybuilds-byte/JavaPythonCRM.git
+```
+
+**SSH:**
+```bash
+git clone git@github.com:coybuilds-byte/JavaPythonCRM.git
+```
+
 ## Architecture
 - **crm-core**: Java Spring Boot (Backend, User Management, Data)
 - **crm-ai-service**: Python FastAPI (Resume Parsing, Skills Extraction)
