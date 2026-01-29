@@ -1,11 +1,27 @@
 # Precision CRM (Java + Python Edition)
 
+[![Open in Antigravity](https://img.shields.io/badge/Open%20in-Antigravity-blue?logo=google&logoColor=white)](https://antigravity.google/)
+
 A 3-tier recruitment CRM with AI capabilities.
 
 ## Architecture
 - **crm-core**: Java Spring Boot (Backend, User Management, Data)
 - **crm-ai-service**: Python FastAPI (Resume Parsing, Skills Extraction)
 - **crm-web**: React + Vite (Frontend Dashboard)
+
+## Getting Started with Antigravity
+
+This repository is optimized for [Google Antigravity](https://antigravity.google/) IDE with pre-configured settings and recommended extensions.
+
+### Open in Antigravity
+
+1. **Install Antigravity**: Download from [antigravity.google](https://antigravity.google/)
+2. **Clone this repository**:
+   - Open Antigravity IDE
+   - Use the built-in Git feature to clone: `https://github.com/coybuilds-byte/JavaPythonCRM.git`
+   - Or open terminal in Antigravity and run: `git clone https://github.com/coybuilds-byte/JavaPythonCRM.git`
+3. **Install recommended extensions**: Antigravity will prompt you to install workspace-recommended extensions
+4. **Follow the Quick Start guide** below to run the services
 
 ## Quick Start
 
