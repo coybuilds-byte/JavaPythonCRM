@@ -23,6 +23,8 @@ This repository is optimized for [Google Antigravity](https://antigravity.google
 3. **Install recommended extensions**: Antigravity will prompt you to install workspace-recommended extensions
 4. **Follow the Quick Start guide** below to run the services
 
+📖 For detailed Antigravity setup instructions, see [ANTIGRAVITY.md](./ANTIGRAVITY.md)
+
 ## Quick Start
 
 ### 1. Python AI Service (Resume Parser)
