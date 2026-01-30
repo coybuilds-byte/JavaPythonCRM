@@ -6,3 +6,6 @@ node_modules/
 crm-core/data/
 .env
 crm-web/.env
+
+__pycache__/
+*.pyc

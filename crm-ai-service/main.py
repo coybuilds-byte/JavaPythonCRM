@@ -5,6 +5,7 @@ from pdfminer.high_level import extract_text as extract_pdf_text
 import docx
 import io
 import re
+from duckduckgo_search import DDGS
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -166,7 +167,7 @@ async def parse_resume(file: UploadFile = File(...)):
 def search_candidates(query: str):
     results = []
     try:
-        from duckduckgo_search import DDGS
+
         with DDGS() as ddgs:
              # Search for LinkedIn profiles matching the query
             search_query = f"site:linkedin.com/in/ OR site:github.com {query}"
