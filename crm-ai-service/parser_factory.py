@@ -15,6 +15,7 @@ class NltkResumeParser(ResumeParser):
             ('tokenizers/punkt', 'punkt'),
             ('tokenizers/punkt_tab', 'punkt_tab'),
             ('chunkers/maxent_ne_chunker', 'maxent_ne_chunker'),
+            ('chunkers/maxent_ne_chunker_tab', 'maxent_ne_chunker_tab'),
             ('corpora/words', 'words'),
             ('taggers/averaged_perceptron_tagger', 'averaged_perceptron_tagger'),
             ('taggers/averaged_perceptron_tagger_eng', 'averaged_perceptron_tagger_eng')
