@@ -135,6 +135,8 @@ def extract_current_title(text: str):
                 
     return None
 
+from parser_factory import ParserFactory
+
 @app.post("/parse-resume", response_model=CandidateProfile)
 async def parse_resume(file: UploadFile = File(...)):
     if not file.filename:
@@ -146,20 +148,18 @@ async def parse_resume(file: UploadFile = File(...)):
     if not text:
         raise HTTPException(status_code=400, detail="Could not extract text from file")
     
-    name = extract_entities(text)
-    email, phone, cell = extract_contact_info(text)
-    address = extract_address(text)
-    skills = extract_skills(text)
-    current_title = extract_current_title(text)
+    # Use Factory to get the parser
+    parser = ParserFactory.get_parser("nltk")
+    parsed_data = parser.parse(text)
     
     return CandidateProfile(
-        name=name,
-        email=email,
-        phone=phone,
-        cell=cell,
-        address=address,
-        skills=skills,
-        current_title=current_title,
+        name=parsed_data.get("name"),
+        email=parsed_data.get("email"),
+        phone=parsed_data.get("phone"),
+        cell=parsed_data.get("phone"), # SpacyParser currently just returns query result for phone, duplicate to cell for now
+        address=parsed_data.get("address"),
+        skills=parsed_data.get("skills"),
+        current_title=None, # Title extraction is harder, kept simple/None for now or could reuse logic
         text_content=text[:1000] # Truncated
     )
 
