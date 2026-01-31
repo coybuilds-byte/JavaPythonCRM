@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-boot-dashboard",
+    "pivotal.vscode-boot-dev-pack",
+    "ms-python.python",
+    "ms-python.venv-selector",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "bradlc.vscode-tailwindcss",
+    "redhat.vscode-yaml",
+    "GitHub.copilot"
+  ]
+}
