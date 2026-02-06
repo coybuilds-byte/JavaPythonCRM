@@ -24,6 +24,9 @@ public class CandidateController {
     @Autowired
     private com.precisioncrm.crmcore.service.NotificationService notificationService;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.EmailService emailService;
+
     @Value("${AI_SERVICE_URL:http://localhost:8000}")
     private String aiServiceUrl;
 
@@ -50,26 +53,46 @@ public class CandidateController {
             candidate.setOwner(principal.getName());
         }
         Candidate saved = candidateRepository.save(candidate);
-        notificationService.createNotification("SYSTEM", "New candidate added: " + saved.getName(), "CANDIDATE", saved.getId());
+        notificationService.createNotification("SYSTEM", "New candidate added: " + saved.getName(), "CANDIDATE",
+                saved.getId());
+
+        // Send Email Notification
+        String subject = "New Candidate Added: " + saved.getName();
+        String body = "A new candidate has been added to the system.\n\n" +
+                "Name: " + saved.getName() + "\n" +
+                "Email: " + saved.getEmail() + "\n" +
+                "Owner: " + saved.getOwner() + "\n\n" +
+                "View Profile: http://localhost:5173/candidates/" + saved.getId();
+        // Send to owner or default admin
+        String to = (saved.getOwner() != null) ? saved.getOwner() : "jesse@precisionsourcemanagement.com";
+        // In real app, look up owner email. For now using owner string if it looks like
+        // email, else default.
+        if (!to.contains("@"))
+            to = "jesse@precisionsourcemanagement.com";
+
+        emailService.sendSimpleMessage(to, subject, body);
+
         return saved;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Candidate candidateDetails, java.security.Principal principal) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Candidate candidateDetails,
+            java.security.Principal principal) {
         return candidateRepository.findById(id)
                 .map(candidate -> {
                     // Ownership check
-                    if (candidateDetails.getOwner() != null && !candidateDetails.getOwner().equals(candidate.getOwner())) {
+                    if (candidateDetails.getOwner() != null
+                            && !candidateDetails.getOwner().equals(candidate.getOwner())) {
                         boolean isAdmin = principal != null && principal.getName().contains("jesse");
                         if (!isAdmin) {
-                             // If not admin, ignore owner change or error. 
-                             // Requirement: "only ever be changed by jesse".
-                             // We will just NOT update the owner field if not jesse, preserving original.
+                            // If not admin, ignore owner change or error.
+                            // Requirement: "only ever be changed by jesse".
+                            // We will just NOT update the owner field if not jesse, preserving original.
                         } else {
                             candidate.setOwner(candidateDetails.getOwner());
                         }
                     }
-                    
+
                     candidate.setName(candidateDetails.getName());
                     candidate.setEmail(candidateDetails.getEmail());
                     candidate.setPhone(candidateDetails.getPhone());
@@ -80,7 +103,7 @@ public class CandidateController {
                     candidate.setSkills(candidateDetails.getSkills());
                     candidate.setResumeText(candidateDetails.getResumeText());
                     // Don't overwrite owner unless handled above
-                    
+
                     return ResponseEntity.ok(candidateRepository.save(candidate));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -110,11 +133,12 @@ public class CandidateController {
             org.springframework.util.MultiValueMap<String, Object> body = new org.springframework.util.LinkedMultiValueMap<>();
             body.add("file", file.getResource());
 
-            org.springframework.http.HttpEntity<org.springframework.util.MultiValueMap<String, Object>> requestEntity = new org.springframework.http.HttpEntity<>(body, headers);
+            org.springframework.http.HttpEntity<org.springframework.util.MultiValueMap<String, Object>> requestEntity = new org.springframework.http.HttpEntity<>(
+                    body, headers);
 
             String url = aiServiceUrl + "/parse-resume";
             ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
-            
+
             if (response.getBody() == null) {
                 return ResponseEntity.badRequest().build();
             }
@@ -124,13 +148,24 @@ public class CandidateController {
             com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(response.getBody());
 
             Candidate candidate = new Candidate();
-            candidate.setName(root.path("name").asText());
-            candidate.setEmail(root.path("email").asText());
-            candidate.setPhone(root.path("phone").asText());
-            candidate.setAddress(root.path("address").asText());
-            candidate.setCell(root.path("cell").asText());
+            String extractedName = root.path("name").asText(null);
+
+            System.out.println("DEBUG: Backend received parse result.");
+            System.out.println("DEBUG: Name: " + extractedName);
+            System.out.println("DEBUG: Email: " + root.path("email").asText());
+
+            if (extractedName == null || extractedName.isEmpty() || "null".equals(extractedName)) {
+                candidate.setName("Unknown Candidate (" + file.getOriginalFilename() + ")");
+            } else {
+                candidate.setName(extractedName);
+            }
+
+            candidate.setEmail(root.path("email").isNull() ? "no-email@provided" : root.path("email").asText());
+            candidate.setPhone(root.path("phone").asText(""));
+            candidate.setAddress(root.path("address").asText(""));
+            candidate.setCell(root.path("cell").asText(""));
             if (root.has("current_title")) {
-                candidate.setCurrentTitle(root.path("current_title").asText());
+                candidate.setCurrentTitle(root.path("current_title").asText(""));
             }
             // Map skills
             if (root.has("skills")) {
@@ -138,14 +173,35 @@ public class CandidateController {
                 root.path("skills").forEach(node -> skills.add(node.asText()));
                 candidate.setSkills(skills);
             }
-            candidate.setResumeText(root.path("text_content").asText());
+            candidate.setResumeText(root.path("text_content").asText(""));
             candidate.setStatus("New"); // Default status
             if (owner != null && !owner.isEmpty()) {
                 candidate.setOwner(owner);
             }
 
             Candidate savedCandidate = candidateRepository.save(candidate);
-            notificationService.createNotification("SYSTEM", "New candidate parsed: " + savedCandidate.getName(), "CANDIDATE", savedCandidate.getId());
+            notificationService.createNotification("SYSTEM", "New candidate parsed: " + savedCandidate.getName(),
+                    "CANDIDATE", savedCandidate.getId());
+
+            // Send Email Notification
+            String subject = "New Candidate Parsed: " + savedCandidate.getName();
+            String emailBody = "A new candidate has been parsed and added.\n\n" +
+                    "Name: " + savedCandidate.getName() + "\n" +
+                    "Email: " + savedCandidate.getEmail() + "\n" +
+                    "Skills: "
+                    + String.join(", ",
+                            savedCandidate.getSkills() != null ? savedCandidate.getSkills()
+                                    : java.util.Collections.emptyList())
+                    + "\n" +
+                    "Owner: " + savedCandidate.getOwner() + "\n\n" +
+                    "View Profile: http://localhost:5173/candidates/" + savedCandidate.getId();
+
+            String to = (savedCandidate.getOwner() != null && savedCandidate.getOwner().contains("@"))
+                    ? savedCandidate.getOwner()
+                    : "jesse@precisionsourcemanagement.com";
+
+            emailService.sendSimpleMessage(to, subject, emailBody);
+            System.out.println("Candidate Saved and Email Sent for: " + savedCandidate.getName());
 
             return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {
@@ -153,6 +209,7 @@ public class CandidateController {
             return ResponseEntity.status(500).body("Error parsing resume: " + e.getMessage());
         }
     }
+
     @GetMapping("/web-search")
     public ResponseEntity<?> webSearch(@RequestParam("query") String query) {
         try {

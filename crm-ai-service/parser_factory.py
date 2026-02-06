@@ -27,9 +27,26 @@ class NltkResumeParser(ResumeParser):
                 nltk.download(download_id)
 
     def parse(self, text: str) -> Dict[str, Any]:
+        email = self._extract_email(text)
+        name = self._extract_name(text)
+        
+        # Fallback: If name unknown but email exists, derive from email
+        if name == "Unknown Candidate" and email:
+            try:
+                username = email.split('@')[0]
+                # distinct first.last or first_last
+                clean_name = re.sub(r'[._-]', ' ', username).title()
+                # If it looks like a name (has spaces), use it
+                if " " in clean_name:
+                    name = clean_name
+                else:
+                    name = clean_name # Better than nothing
+            except Exception:
+                pass
+
         return {
-            "name": self._extract_name(text),
-            "email": self._extract_email(text),
+            "name": name,
+            "email": email,
             "phone": self._extract_phone(text),
             "address": self._extract_address(text),
             "skills": self._extract_skills(text),
@@ -58,33 +75,45 @@ class NltkResumeParser(ResumeParser):
         return "Unknown Candidate"
 
     def _extract_email(self, text: str) -> Optional[str]:
-        email_match = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)
+        # Loosen email regex to catch case issues or complex domains
+        email_match = re.search(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', text)
         return email_match.group(0) if email_match else None
 
     def _extract_phone(self, text: str) -> Optional[str]:
-        phone_pattern = r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+        # Loosen phone: Matches 10-digit strings that *might* be phones, even if formatting is weird
+        # Look for sequences of 10-15 digits with common separators
+        phone_pattern = r'(\+?1?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})'
         phones = re.findall(phone_pattern, text)
-        return phones[0] if phones else None
+        
+        # Filter out "years" like 2020-2024 which might match the loose pattern if we aren't careful
+        valid_phones = []
+        for p in phones:
+            digits = re.sub(r'\D', '', p)
+            if len(digits) >= 10:
+                 valid_phones.append(p.strip())
+                 
+        return valid_phones[0] if valid_phones else None
 
     def _extract_address(self, text: str) -> Optional[str]:
-        # NLTK GPE strategy combined with Zip code regex
+        # Strategy 1: Look for Zip Code (US) - Strong signal
         zip_pattern = r'\b\d{5}(?:-\d{4})?\b'
         
-        try:
-            for line in text.split('\n'):
-                if re.search(zip_pattern, line):
-                    return line.strip()
-                    
-            # Fallback: Look for GPE using NLTK
-            tokens = nltk.word_tokenize(text[:2000]) # Tokenize first chunk
-            tags = nltk.pos_tag(tokens)
-            chunks = nltk.ne_chunk(tags)
-            for chunk in chunks:
-                 if hasattr(chunk, 'label') and chunk.label() == 'GPE':
-                     return ' '.join(c[0] for c in chunk)
-        except Exception:
-            pass
+        lines = text.split('\n')
+        for line in lines[:20]: # Check top 20 lines usually has address
+            if re.search(zip_pattern, line):
+                # If line has a zip, it's likely an address line.
+                # Clean it up - remove labels like "Address:"
+                clean_line = re.sub(r'(?i)address[:\s]*', '', line).strip()
+                return clean_line
             
+        # Strategy 2: Look for City, State pattern (e.g. "San Francisco, CA")
+        # Matches "Word, XX" where XX is 2 uppercase letters
+        city_state_pattern = r'([A-Z][a-z]+(?: [A-Z][a-z]+)*,\s*[A-Z]{2})'
+        for line in lines[:20]:
+             match = re.search(city_state_pattern, line)
+             if match:
+                 return line.strip()
+
         return None
 
     def _extract_skills(self, text: str) -> list:

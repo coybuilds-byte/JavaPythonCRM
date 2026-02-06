@@ -41,12 +41,17 @@ public class JobOrderController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody JobOrder jobOrder) {
         if (jobOrder.getClient() != null && jobOrder.getClient().getId() != null) {
-            com.precisioncrm.crmcore.model.Client client = clientRepository.findById(jobOrder.getClient().getId()).orElse(null);
-            if(client == null) return ResponseEntity.badRequest().body("Client not found");
+            com.precisioncrm.crmcore.model.Client client = clientRepository.findById(jobOrder.getClient().getId())
+                    .orElse(null);
+            if (client == null)
+                return ResponseEntity.badRequest().body("Client not found");
             jobOrder.setClient(client);
         }
         JobOrder saved = jobOrderRepository.save(jobOrder);
-        notificationService.createNotification("SYSTEM", "New Job Order: " + saved.getTitle() + " for " + (saved.getClient() != null ? saved.getClient().getCompanyName() : "Unknown Client"), "JOB", saved.getId());
+        notificationService.createNotification("SYSTEM",
+                "New Job Order: " + saved.getTitle() + " for "
+                        + (saved.getClient() != null ? saved.getClient().getCompanyName() : "Unknown Client"),
+                "JOB", saved.getId());
         return ResponseEntity.ok(saved);
     }
 
@@ -59,13 +64,13 @@ public class JobOrderController {
                     jobOrder.setOpenPositions(jobOrderDetails.getOpenPositions());
                     jobOrder.setDescription(jobOrderDetails.getDescription());
                     jobOrder.setSizzle(jobOrderDetails.getSizzle());
-                    
-                    if(jobOrderDetails.getClient() != null && jobOrderDetails.getClient().getId() != null) {
-                         // Ideally verify client exists
-                         clientRepository.findById(jobOrderDetails.getClient().getId())
-                            .ifPresent(jobOrder::setClient);
+
+                    if (jobOrderDetails.getClient() != null && jobOrderDetails.getClient().getId() != null) {
+                        // Ideally verify client exists
+                        clientRepository.findById(jobOrderDetails.getClient().getId())
+                                .ifPresent(jobOrder::setClient);
                     }
-                    
+
                     return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -74,16 +79,34 @@ public class JobOrderController {
     @Autowired
     private com.precisioncrm.crmcore.repository.CandidateRepository candidateRepository;
 
+    @Autowired
+    private com.precisioncrm.crmcore.repository.JobApplicationRepository jobApplicationRepository;
+
     @PostMapping("/{jobId}/candidates/{candidateId}")
-    public ResponseEntity<JobOrder> addCandidate(@PathVariable Long jobId, @PathVariable Long candidateId) {
+    public ResponseEntity<?> addCandidate(@PathVariable Long jobId, @PathVariable Long candidateId) {
         return jobOrderRepository.findById(jobId)
-            .map(jobOrder -> {
-                return candidateRepository.findById(candidateId)
-                    .map(candidate -> {
-                        jobOrder.getCandidates().add(candidate);
-                        return ResponseEntity.ok(jobOrderRepository.save(jobOrder));
-                    }).orElse(ResponseEntity.notFound().build());
-            }).orElse(ResponseEntity.notFound().build());
+                .map(jobOrder -> {
+                    return candidateRepository.findById(candidateId)
+                            .map(candidate -> {
+                                // Check if already applied
+                                boolean exists = jobOrder.getApplications().stream()
+                                        .anyMatch(app -> app.getCandidate().getId().equals(candidateId));
+
+                                if (exists) {
+                                    return ResponseEntity.badRequest().body("Candidate already applied to this job");
+                                }
+
+                                com.precisioncrm.crmcore.model.JobApplication application = new com.precisioncrm.crmcore.model.JobApplication();
+                                application.setJobOrder(jobOrder);
+                                application.setCandidate(candidate);
+                                application.setStatus(
+                                        com.precisioncrm.crmcore.model.JobApplication.ApplicationStatus.APPLIED);
+
+                                jobApplicationRepository.save(application);
+
+                                return ResponseEntity.ok(jobOrderRepository.save(jobOrder)); // Return updated job
+                            }).orElse(ResponseEntity.notFound().build());
+                }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
