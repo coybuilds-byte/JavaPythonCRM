@@ -128,7 +128,8 @@ public class CandidateController {
         String owner = (principal != null) ? principal.getName() : null;
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-            headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+            // headers.setContentType(org.springframework.http.MediaType.MULTIPART_FORM_DATA);
+            // // Removed to allow auto-boundary generation
 
             org.springframework.util.MultiValueMap<String, Object> body = new org.springframework.util.LinkedMultiValueMap<>();
             body.add("file", file.getResource());
