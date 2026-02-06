@@ -67,14 +67,17 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
                 body: formData,
             })
 
-            if (!response.ok) throw new Error('Parsing failed')
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'Unknown error occurred');
+                throw new Error(`Parsing failed: ${response.status} ${errorText}`);
+            }
 
             const data = await response.json()
             setResult(data)
             setStatus('Success')
         } catch (err) {
-            console.error(err)
-            setStatus('Error occurred')
+            console.error("Resume parsing error:", err)
+            setStatus(err instanceof Error ? err.message : 'Error occurred during parsing')
         }
     }
 
