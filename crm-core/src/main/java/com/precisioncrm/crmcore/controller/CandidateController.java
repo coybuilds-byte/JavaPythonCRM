@@ -222,4 +222,20 @@ public class CandidateController {
             return ResponseEntity.status(500).body("Error connecting to AI Search Service");
         }
     }
+    @GetMapping("/debug-connection")
+    public ResponseEntity<java.util.Map<String, Object>> debugConnection() {
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("configuredUrl", aiServiceUrl);
+        try {
+            String url = aiServiceUrl + "/health";
+            ResponseEntity<String> healthResponse = restTemplate.getForEntity(url, String.class);
+            response.put("status", "Success");
+            response.put("backendResponse", healthResponse.getBody());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "Failure");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
 }
