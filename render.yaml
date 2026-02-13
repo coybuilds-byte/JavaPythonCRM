@@ -9,7 +9,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: AI_SERVICE_URL
-        value: http://crm-ai-service:8000
+        value: http://crm-ai-service:10000
     plan: free
 
   # AI Service
