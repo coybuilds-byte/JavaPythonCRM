@@ -219,9 +219,10 @@ public class CandidateController {
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error connecting to AI Search Service");
+            return ResponseEntity.status(500).body("Error connecting to AI Search Service: " + e.getMessage());
         }
     }
+
     @GetMapping("/debug-connection")
     public ResponseEntity<java.util.Map<String, Object>> debugConnection() {
         java.util.Map<String, Object> response = new java.util.HashMap<>();
