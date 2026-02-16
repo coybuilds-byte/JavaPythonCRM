@@ -20,15 +20,16 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
                                 .authorizeHttpRequests((requests) -> requests
-                                                .requestMatchers("/api/public/**", "/api/candidates/parse",
+                                                .requestMatchers("/", "/error", "/api/public/**",
+                                                                "/api/candidates/parse",
                                                                 "/api/candidates/debug-connection", "/api/dashboard")
                                                 .permitAll()
-                                                .requestMatchers("/api/notifications/**").authenticated() // Explicitly
-                                                                                                          // showing
-                                                                                                          // intent,
-                                                                                                          // though
-                                                                                                          // anyRequest
-                                                                                                          // covers it
+                                                .requestMatchers("/api/notifications/**").authenticated()
+                                                // showing
+                                                // intent,
+                                                // though
+                                                // anyRequest
+                                                // covers it
                                                 .anyRequest().authenticated())
                                 .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable
                                                                                                            // Basic Auth
