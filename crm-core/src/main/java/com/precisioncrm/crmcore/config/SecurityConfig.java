@@ -20,10 +20,11 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/public/**", "/api/candidates/parse").permitAll()
-                        .requestMatchers("/api/notifications/**").authenticated() // Explicitly showing intent, though anyRequest covers it
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/api/public/**", "/api/candidates/parse", "/api/candidates/debug-connection")
+                        .permitAll()
+                        .requestMatchers("/api/notifications/**").authenticated() // Explicitly showing intent, though
+                                                                                  // anyRequest covers it
+                        .anyRequest().authenticated())
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable Basic Auth
 
         return http.build();
@@ -33,11 +34,10 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
         configuration.setAllowedOrigins(java.util.Arrays.asList(
-            "http://localhost:5173", 
-            "https://crm-frontend.onrender.com", 
-            "https://www.psmtechstaffing.com",
-            "https://psmtechstaffing.com"
-        ));
+                "http://localhost:5173",
+                "https://crm-frontend.onrender.com",
+                "https://www.psmtechstaffing.com",
+                "https://psmtechstaffing.com"));
         configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .password("{noop}Staffpass1!")
                 .roles("RECRUITER")
                 .build();
-        
+
         UserDetails user3 = User.withUsername("kassandra@precisionsourcemanagement.com")
                 .password("{noop}Staffpass1!")
                 .roles("RECRUITER")
