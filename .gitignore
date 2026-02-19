@@ -6,3 +6,11 @@ node_modules/
 crm-core/data/
 .env
 crm-web/.env
+
+__pycache__/
+*.pyc
+
+debug_last_extraction.txt
+debug_upload.py
+audio_*.wav
+test_write.txt

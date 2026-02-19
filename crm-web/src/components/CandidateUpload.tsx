@@ -67,20 +67,23 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
                 body: formData,
             })
 
-            if (!response.ok) throw new Error('Parsing failed')
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => 'Unknown error occurred');
+                throw new Error(`Parsing failed: ${response.status} ${errorText}`);
+            }
 
             const data = await response.json()
             setResult(data)
             setStatus('Success')
         } catch (err) {
-            console.error(err)
-            setStatus('Error occurred')
+            console.error("Resume parsing error:", err)
+            setStatus(err instanceof Error ? err.message : 'Error occurred during parsing')
         }
     }
 
     return (
         <div className="upload-section">
-            <div 
+            <div
                 className={`dropzone ${isDragging ? 'dragging' : ''} ${file ? 'has-file' : ''}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -96,9 +99,9 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
             </div>
 
             <div className="actions">
-                <button 
-                    className="btn-primary" 
-                    onClick={handleUpload} 
+                <button
+                    className="btn-primary"
+                    onClick={handleUpload}
                     disabled={!file || status === 'Parsing...'}
                 >
                     {status === 'Parsing...' ? 'Analyzing...' : 'Parse Resume'}
@@ -112,9 +115,18 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
                         <div>
                             <h3>{result.name}</h3>
                             <p className="contact-info">{result.email} • {result.phone}</p>
+                            {/* We expect the backend to return the full candidate object now, including ID if we want to link. 
+                                However, the interface ParsedResult at top of file might need update or we handle loose typing.
+                                The backend returns the SAVED candidate.
+                            */}
+                            <div style={{ marginTop: '0.5rem' }}>
+                                <a href={`/candidates/${(result as any).id}`} className="btn-secondary" style={{ textDecoration: 'none', fontSize: '0.8rem', padding: '4px 8px' }}>
+                                    View Full Profile
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div className="skills-section">
                         <h4>Skills Detected</h4>
                         <div className="skills-grid">

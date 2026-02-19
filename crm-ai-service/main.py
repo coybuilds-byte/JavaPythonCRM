@@ -5,6 +5,7 @@ from pdfminer.high_level import extract_text as extract_pdf_text
 import docx
 import io
 import re
+from duckduckgo_search import DDGS
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,7 +13,13 @@ app = FastAPI(title="CRM AI Service", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8080"],
+    allow_origins=[
+        "http://localhost:5173", 
+        "http://localhost:8080", 
+        "https://crm-frontend.onrender.com", 
+        "https://www.psmtechstaffing.com",
+        "https://psmtechstaffing.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,8 +39,26 @@ def extract_text(file_content: bytes, filename: str) -> str:
     text = ""
     try:
         if filename.lower().endswith(".pdf"):
-            with io.BytesIO(file_content) as f:
-                text = extract_pdf_text(f)
+            # Method 1: PDFMiner
+            try:
+                with io.BytesIO(file_content) as f:
+                    text = extract_pdf_text(f)
+            except Exception as e:
+                print(f"PDFMiner failed: {e}")
+
+            # Method 2: element-based fallback (pypdf) if text is scarce
+            if not text or len(text.strip()) < 10:
+                print("PDFMiner returned empty/low text. Trying pypdf...")
+                try:
+                    import pypdf
+                    with io.BytesIO(file_content) as f:
+                        reader = pypdf.PdfReader(f)
+                        text = ""
+                        for page in reader.pages:
+                            text += page.extract_text() + "\n"
+                except Exception as e:
+                     print(f"pypdf failed: {e}")
+
         elif filename.lower().endswith(".docx"):
             with io.BytesIO(file_content) as f:
                 doc = docx.Document(f)
@@ -128,6 +153,8 @@ def extract_current_title(text: str):
                 
     return None
 
+from parser_factory import ParserFactory
+
 @app.post("/parse-resume", response_model=CandidateProfile)
 async def parse_resume(file: UploadFile = File(...)):
     if not file.filename:
@@ -139,20 +166,30 @@ async def parse_resume(file: UploadFile = File(...)):
     if not text:
         raise HTTPException(status_code=400, detail="Could not extract text from file")
     
-    name = extract_entities(text)
-    email, phone, cell = extract_contact_info(text)
-    address = extract_address(text)
-    skills = extract_skills(text)
-    current_title = extract_current_title(text)
+    # Use Factory to get the parser
+    parser = ParserFactory.get_parser("nltk")
+    parsed_data = parser.parse(text)
     
+    print(f"DEBUG: Extracted text length: {len(text)}")
+    print(f"DEBUG: Initial Parsed Name: {parsed_data.get('name')}")
+
+    # Final Fallback: Filename
+    final_name = parsed_data.get("name")
+    if not final_name or final_name == "Unknown Candidate":
+        # clean filename: "John_Doe_Resume.pdf" -> "John Doe Resume"
+        clean_filename = file.filename.rsplit('.', 1)[0]
+        clean_filename = clean_filename.replace('_', ' ').replace('-', ' ')
+        final_name = clean_filename.title()
+        print(f"DEBUG: Used filename fallback: {final_name}")
+
     return CandidateProfile(
-        name=name,
-        email=email,
-        phone=phone,
-        cell=cell,
-        address=address,
-        skills=skills,
-        current_title=current_title,
+        name=final_name,
+        email=parsed_data.get("email"),
+        phone=parsed_data.get("phone"),
+        cell=parsed_data.get("phone"), # SpacyParser currently just returns query result for phone, duplicate to cell for now
+        address=parsed_data.get("address"),
+        skills=parsed_data.get("skills"),
+        current_title=None, # Title extraction is harder, kept simple/None for now or could reuse logic
         text_content=text[:1000] # Truncated
     )
 
@@ -160,40 +197,48 @@ async def parse_resume(file: UploadFile = File(...)):
 def search_candidates(query: str):
     results = []
     try:
-        from duckduckgo_search import DDGS
-        with DDGS() as ddgs:
-             # Search for LinkedIn profiles matching the query
-            search_query = f"site:linkedin.com/in/ OR site:github.com {query}"
-            for r in ddgs.text(search_query, max_results=5):
-                results.append({
-                    "title": r.get('title'),
-                    "href": r.get('href'),
-                    "body": r.get('body')
-                })
-    except Exception as e:
-        print(f"Search error: {e}")
-        # Proceed to fallback check
-        
-    if not results:
-        # Fallback to simulated results if live search fails/is blocked
-        # This ensures the user Experience is preserved during demos
-        import random
-        base_roles = ["Senior", "Lead", "Junior", "Principle"]
-        common_names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Drew"]
-        
-        # Extract potential role from query
-        role_guess = query.replace("site:linkedin.com/in/", "").replace("site:github.com", "").strip() or "Engineer"
-        
-        for i in range(4):
-            name = f"{random.choice(common_names)} {chr(65+i)}."
-            role = f"{random.choice(base_roles)} {role_guess}"
-            results.append({
-                "title": f"{name} - {role} | LinkedIn",
-                "href": f"https://linkedin.com/in/example-{i}",
-                "body": f"Experienced {role} with a demonstrated history of working in the tech industry. Skilled in {query}..."
-            })
+        # Try live search first
+        try:
+            with DDGS() as ddgs:
+                 # Search for LinkedIn profiles matching the query
+                search_query = f"site:linkedin.com/in/ OR site:github.com {query}"
+                # Add timeout to prevent hanging
+                for r in ddgs.text(search_query, max_results=5):
+                    results.append({
+                        "title": r.get('title'),
+                        "href": r.get('href'),
+                        "body": r.get('body')
+                    })
+        except Exception as e:
+            print(f"DuckDuckGo Search error: {str(e)}")
+            # Fall through to fallback
             
-    return {"results": results}
+        if not results:
+            print("No live results found or search failed. Using simulation fallback.")
+            # Fallback to simulated results if live search fails/is blocked
+            # This ensures the user Experience is preserved during demos
+            import random
+            base_roles = ["Senior", "Lead", "Junior", "Principle"]
+            common_names = ["Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Jamie", "Drew"]
+            
+            # Extract potential role from query
+            role_guess = query.replace("site:linkedin.com/in/", "").replace("site:github.com", "").strip() or "Engineer"
+            
+            for i in range(4):
+                name = f"{random.choice(common_names)} {chr(65+i)}."
+                role = f"{random.choice(base_roles)} {role_guess}"
+                results.append({
+                    "title": f"{name} - {role} | LinkedIn",
+                    "href": f"https://linkedin.com/in/example-{i}",
+                    "body": f"Experienced {role} with a demonstrated history of working in the tech industry. Skilled in {query}..."
+                })
+                
+        return {"results": results}
+
+    except Exception as e:
+        print(f"Critical error in search_candidates: {str(e)}")
+        # Return empty list or basic error structure instead of 500
+        return {"results": [], "error": str(e)}
 
 @app.get("/health")
 def health():

@@ -14,56 +14,63 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/public/**", "/api/candidates/parse").permitAll()
-                        .requestMatchers("/api/notifications/**").authenticated() // Explicitly showing intent, though anyRequest covers it
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable Basic Auth
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
+                                .authorizeHttpRequests((requests) -> requests
+                                                .requestMatchers("/", "/error", "/api/public/**",
+                                                                "/api/candidates/parse",
+                                                                "/api/candidates/debug-connection", "/api/dashboard")
+                                                .permitAll()
+                                                .requestMatchers("/api/notifications/**").authenticated()
+                                                // showing
+                                                // intent,
+                                                // though
+                                                // anyRequest
+                                                // covers it
+                                                .anyRequest().authenticated())
+                                .httpBasic(org.springframework.security.config.Customizer.withDefaults()); // Enable
+                                                                                                           // Basic Auth
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.setAllowedOrigins(java.util.Arrays.asList(
-            "http://localhost:5173", 
-            "https://crm-frontend.onrender.com", 
-            "https://www.psmtechstaffing.com",
-            "https://psmtechstaffing.com"
-        ));
-        configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
-        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+        @Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+                org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+                configuration.setAllowedOrigins(java.util.Arrays.asList(
+                                "http://localhost:5173",
+                                "https://crm-frontend.onrender.com",
+                                "https://www.psmtechstaffing.com",
+                                "https://psmtechstaffing.com"));
+                configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
+                configuration.setAllowCredentials(true);
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        // Defining users as per requirements
-        UserDetails user1 = User.withUsername("jesse@precisionsourcemanagement.com")
-                .password("{noop}Staffpass1!")
-                .roles("RECRUITER", "ADMIN")
-                .build();
+        @Bean
+        public UserDetailsService userDetailsService() {
+                // Defining users as per requirements
+                UserDetails user1 = User.withUsername("jesse@precisionsourcemanagement.com")
+                                .password("{noop}Staffpass1!")
+                                .roles("RECRUITER", "ADMIN")
+                                .build();
 
-        UserDetails user2 = User.withUsername("dianeb@precisionsourcemanagement.com")
-                .password("{noop}Staffpass1!")
-                .roles("RECRUITER")
-                .build();
-        
-        UserDetails user3 = User.withUsername("kassandra@precisionsourcemanagement.com")
-                .password("{noop}Staffpass1!")
-                .roles("RECRUITER")
-                .build();
+                UserDetails user2 = User.withUsername("dianeb@precisionsourcemanagement.com")
+                                .password("{noop}Staffpass1!")
+                                .roles("RECRUITER")
+                                .build();
 
-        return new InMemoryUserDetailsManager(user1, user2, user3);
-    }
+                UserDetails user3 = User.withUsername("kassandra@precisionsourcemanagement.com")
+                                .password("{noop}Staffpass1!")
+                                .roles("RECRUITER")
+                                .build();
+
+                return new InMemoryUserDetailsManager(user1, user2, user3);
+        }
 }

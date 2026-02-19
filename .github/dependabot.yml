@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Maintain dependencies for Java Backend (Maven)
+  - package-ecosystem: "maven"
+    directory: "/crm-core"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Maintain dependencies for AI Service (pip)
+  - package-ecosystem: "pip"
+    directory: "/crm-ai-service"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Maintain dependencies for Frontend (npm)
+  - package-ecosystem: "npm"
+    directory: "/crm-web"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

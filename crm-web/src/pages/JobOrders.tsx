@@ -81,7 +81,7 @@ export default function JobOrders() {
                 description: newJob.description,
                 status: newJob.status,
                 sizzle: newJob.sizzle,
-                client: client, 
+                client: client,
             };
 
             const res = await fetch('/api/job-orders', {
@@ -127,24 +127,24 @@ export default function JobOrders() {
                 {jobs.map(job => {
                     const location = job.client ? `${job.client.city}, ${job.client.state}` : 'Location TBD';
                     const candidateCount = job.candidates ? job.candidates.length : 0;
-                    
+
                     return (
-                        <div 
-                            key={job.id} 
-                            className="job-card card" 
-                            onClick={() => setSelectedJob(job)} 
-                            style={{cursor: 'pointer'}}
+                        <div
+                            key={job.id}
+                            className="job-card card"
+                            onClick={() => setSelectedJob(job)}
+                            style={{ cursor: 'pointer' }}
                         >
                             <div className="job-header">
                                 <div>
                                     <h3>{job.title}</h3>
                                     <p className="client-name">{job.client?.companyName || 'No Client Assigned'}</p>
                                 </div>
-                                <button className="icon-btn"><MoreHorizontal size={20}/></button>
+                                <button className="icon-btn"><MoreHorizontal size={20} /></button>
                             </div>
-                            
+
                             <div className="job-details">
-                                <span className="location"><MapPin size={14}/> {location}</span>
+                                <span className="location"><MapPin size={14} /> {location}</span>
                                 <span className="salary">Salary TBD</span>
                             </div>
 
@@ -155,7 +155,7 @@ export default function JobOrders() {
                         </div>
                     );
                 })}
-                {jobs.length === 0 && <div style={{padding: 20, textAlign: 'center'}}>No job orders found.</div>}
+                {jobs.length === 0 && <div style={{ padding: 20, textAlign: 'center' }}>No job orders found.</div>}
             </div>
 
             {/* Create Job Modal */}
@@ -166,18 +166,18 @@ export default function JobOrders() {
                         <form onSubmit={handleCreateJob}>
                             <div className="form-group">
                                 <label>Job Title</label>
-                                <input 
-                                    type="text" 
-                                    value={newJob.title} 
-                                    onChange={e => setNewJob({...newJob, title: e.target.value})} 
-                                    required 
+                                <input
+                                    type="text"
+                                    value={newJob.title}
+                                    onChange={e => setNewJob({ ...newJob, title: e.target.value })}
+                                    required
                                 />
                             </div>
                             <div className="form-group">
                                 <label>Client</label>
-                                <select 
-                                    value={newJob.clientId} 
-                                    onChange={e => setNewJob({...newJob, clientId: e.target.value})}
+                                <select
+                                    value={newJob.clientId}
+                                    onChange={e => setNewJob({ ...newJob, clientId: e.target.value })}
                                     required
                                 >
                                     <option value="">Select Client...</option>
@@ -186,11 +186,11 @@ export default function JobOrders() {
                                     ))}
                                 </select>
                             </div>
-                             <div className="form-group">
+                            <div className="form-group">
                                 <label>Status</label>
-                                <select 
-                                    value={newJob.status} 
-                                    onChange={e => setNewJob({...newJob, status: e.target.value})}
+                                <select
+                                    value={newJob.status}
+                                    onChange={e => setNewJob({ ...newJob, status: e.target.value })}
                                 >
                                     <option value="Open">Open</option>
                                     <option value="Closed">Closed</option>
@@ -199,17 +199,17 @@ export default function JobOrders() {
                             </div>
                             <div className="form-group">
                                 <label>Description</label>
-                                <textarea 
-                                    value={newJob.description} 
-                                    onChange={e => setNewJob({...newJob, description: e.target.value})}
+                                <textarea
+                                    value={newJob.description}
+                                    onChange={e => setNewJob({ ...newJob, description: e.target.value })}
                                     rows={4}
                                 />
                             </div>
                             <div className="form-group">
                                 <label>The "Sizzle" (Why work here?)</label>
-                                <textarea 
-                                    value={newJob.sizzle} 
-                                    onChange={e => setNewJob({...newJob, sizzle: e.target.value})}
+                                <textarea
+                                    value={newJob.sizzle}
+                                    onChange={e => setNewJob({ ...newJob, sizzle: e.target.value })}
                                     placeholder="Enter the exciting selling points of this job..."
                                     rows={3}
                                 />
@@ -227,32 +227,39 @@ export default function JobOrders() {
             {selectedJob && (
                 <div className="modal-overlay" onClick={() => setSelectedJob(null)}>
                     <div className="modal-content card" onClick={e => e.stopPropagation()}>
-                        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'start'}}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                             <h2>{selectedJob.title}</h2>
                             <button className="icon-btn" onClick={() => setSelectedJob(null)}>X</button>
                         </div>
-                        <p className="client-name" style={{marginBottom: 16}}>{selectedJob.client?.companyName}</p>
-                        
+                        <p className="client-name" style={{ marginBottom: 16 }}>{selectedJob.client?.companyName}</p>
+
                         <div className="form-group">
                             <label>Description</label>
-                            <p style={{whiteSpace: 'pre-wrap', color: 'var(--text-secondary)'}}>{selectedJob.description || 'No description provided.'}</p>
+                            <p style={{ whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>{selectedJob.description || 'No description provided.'}</p>
                         </div>
-                        
+
                         {selectedJob.sizzle && (
-                            <div className="form-group" style={{marginTop: '12px', padding: '10px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '4px'}}>
-                                <label style={{color: '#ffd700'}}>🔥 The Sizzle</label>
-                                <p style={{whiteSpace: 'pre-wrap', marginTop: '4px'}}>{selectedJob.sizzle}</p>
+                            <div className="form-group" style={{ marginTop: '12px', padding: '10px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: '4px' }}>
+                                <label style={{ color: '#ffd700' }}>🔥 The Sizzle</label>
+                                <p style={{ whiteSpace: 'pre-wrap', marginTop: '4px' }}>{selectedJob.sizzle}</p>
                             </div>
                         )}
-                        
-                        <div style={{marginTop: 20}}>
+
+                        <div style={{ marginTop: 20 }}>
                             <span className={`status-pill ${selectedJob.status ? selectedJob.status.toLowerCase() : 'open'}`}>{selectedJob.status}</span>
                         </div>
-                        
-                         <div className="modal-actions">
+
+                        <div className="modal-actions">
                             <button className="btn-secondary" onClick={() => setSelectedJob(null)}>Close</button>
-                            <button 
-                                className="btn-primary" 
+                            <button
+                                className="btn-secondary"
+                                style={{ marginRight: '12px' }}
+                                onClick={() => navigate(`/candidates?mode=list&query=${encodeURIComponent(selectedJob.title)}`)}
+                            >
+                                Search Database
+                            </button>
+                            <button
+                                className="btn-primary"
                                 onClick={() => navigate(`/candidates?mode=web-search&query=${encodeURIComponent(selectedJob.title)}`)}
                             >
                                 Search Candidates (AI)
