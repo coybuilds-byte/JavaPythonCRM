@@ -9,7 +9,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: AI_SERVICE_URL
-        value: http://crm-ai-service:10000
+        value: https://crm-ai-service.onrender.com
     plan: free
 
   # AI Service
