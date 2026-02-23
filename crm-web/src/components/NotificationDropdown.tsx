@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Bell, Check, Users } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
+import { getCsrfToken } from '../utils/csrf';
 import './NotificationDropdown.css'; // Will create CSS separately or inline
 
 interface Notification {
@@ -48,7 +49,10 @@ export default function NotificationDropdown({ onOpenBroadcast }: NotificationDr
         try {
             await fetch(`${API_BASE_URL}/api/notifications/read/${id}`, {
                 method: 'POST',
-                headers: { 'Authorization': token || '' }
+                headers: {
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                }
             });
             // Optimistic update
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
@@ -60,7 +64,10 @@ export default function NotificationDropdown({ onOpenBroadcast }: NotificationDr
         try {
             await fetch(`${API_BASE_URL}/api/notifications/read-all`, {
                 method: 'POST',
-                headers: { 'Authorization': token || '' }
+                headers: {
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                }
             });
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));
             setUnreadCount(0);

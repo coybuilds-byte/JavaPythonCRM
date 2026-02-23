@@ -18,7 +18,14 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .csrf(csrf -> csrf.disable()) // Disable CSRF for simple API usage
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(
+                                                                org.springframework.security.web.csrf.CookieCsrfTokenRepository
+                                                                                .withHttpOnlyFalse())
+                                                .csrfTokenRequestHandler(
+                                                                new org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler()))
+                                .addFilterAfter(new CsrfCookieFilter(),
+                                                org.springframework.security.web.authentication.www.BasicAuthenticationFilter.class)
                                 .authorizeHttpRequests((requests) -> requests
                                                 .requestMatchers("/", "/error", "/api/public/**",
                                                                 "/api/candidates/parse",
@@ -74,6 +81,21 @@ public class SecurityConfig {
                                 .roles("RECRUITER")
                                 .build();
 
-                return new InMemoryUserDetailsManager(user1, user2, user3);
+                return new org.springframework.security.provisioning.InMemoryUserDetailsManager(user1, user2, user3);
+        }
+
+        private static final class CsrfCookieFilter extends org.springframework.web.filter.OncePerRequestFilter {
+                @Override
+                protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
+                                jakarta.servlet.http.HttpServletResponse response,
+                                jakarta.servlet.FilterChain filterChain)
+                                throws jakarta.servlet.ServletException, java.io.IOException {
+                        org.springframework.security.web.csrf.CsrfToken csrfToken = (org.springframework.security.web.csrf.CsrfToken) request
+                                        .getAttribute(org.springframework.security.web.csrf.CsrfToken.class.getName());
+                        if (null != csrfToken.getHeaderName()) {
+                                response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
+                        }
+                        filterChain.doFilter(request, response);
+                }
         }
 }

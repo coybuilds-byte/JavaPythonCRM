@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Mail, Phone, MapPin, Calendar, FileText } from 'lucide-react';
+import { getCsrfToken } from '../utils/csrf';
 import './ClientProfile.css';
 import JobOrderForm from '../components/JobOrderForm';
 import ContactForm from '../components/ContactForm';
@@ -107,7 +108,8 @@ export default function ClientProfile() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token || ''
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: JSON.stringify(payload)
             });
@@ -168,7 +170,10 @@ export default function ClientProfile() {
             // Apply (create JobApplication)
             const res = await fetch(`${API_BASE_URL}/api/job-orders/${selectedJob}/candidates/${selectedCandidate}`, {
                 method: 'POST',
-                headers: { 'Authorization': token || '' }
+                headers: {
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                }
             });
 
             if (res.ok) {
@@ -200,7 +205,11 @@ export default function ClientProfile() {
 
             const res = await fetch(`${API_BASE_URL}/api/applications/${selectedApplication.id}/status?sendPrepEmail=${sendPrep}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -246,7 +255,11 @@ export default function ClientProfile() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/clients/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token || '',
+                        'X-XSRF-TOKEN': getCsrfToken() || ''
+                    },
                     body: JSON.stringify(getCleanClientPayload({ logoUrl: base64String }))
                 });
                 if (res.ok) fetchClient();
@@ -263,7 +276,11 @@ export default function ClientProfile() {
 
             await fetch(`${API_BASE_URL}/api/clients/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                },
                 body: JSON.stringify(getCleanClientPayload({ sizzle: tempSizzle }))
             });
             setEditingSizzle(false);
@@ -281,7 +298,11 @@ export default function ClientProfile() {
 
             const res = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -299,7 +320,10 @@ export default function ClientProfile() {
         try {
             await fetch(`${API_BASE_URL}/api/contacts/${contactId}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': token || '' }
+                headers: {
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
+                }
             });
             fetchClient();
         } catch (e) { console.error(e); }
@@ -445,7 +469,11 @@ export default function ClientProfile() {
                                     try {
                                         const res = await fetch(`${API_BASE_URL}/api/email/send`, {
                                             method: 'POST',
-                                            headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': token || '',
+                                                'X-XSRF-TOKEN': getCsrfToken() || ''
+                                            },
                                             body: JSON.stringify({
                                                 to: client?.email,
                                                 subject,
@@ -456,7 +484,11 @@ export default function ClientProfile() {
 
                                         await fetch(`${API_BASE_URL}/api/activities`, {
                                             method: 'POST',
-                                            headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': token || '',
+                                                'X-XSRF-TOKEN': getCsrfToken() || ''
+                                            },
                                             body: JSON.stringify({
                                                 type: 'EMAIL',
                                                 content: `Subject: ${subject} - Body: ${body}`,

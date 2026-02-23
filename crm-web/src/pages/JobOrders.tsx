@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
+import { getCsrfToken } from '../utils/csrf';
 import { Plus, Filter, MoreHorizontal, MapPin } from 'lucide-react';
 import './JobOrders.css';
 
@@ -95,7 +96,8 @@ export default function JobOrders() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': token } : {})
+                    ...(token ? { 'Authorization': token } : {}),
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: JSON.stringify(payload)
             });

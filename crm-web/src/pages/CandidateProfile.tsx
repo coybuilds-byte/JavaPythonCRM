@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, Linkedin, FileText, ExternalLink, Calendar, MapPinHouse, Send, Tag, Pencil, Trash2, Clock, Briefcase, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
+import { getCsrfToken } from '../utils/csrf';
 import './CandidateProfile.css';
 
 interface Candidate {
@@ -153,7 +154,10 @@ export default function CandidateProfile() {
                                     const jobId = e.target.value;
                                     fetch(`${API_BASE_URL}/api/job-orders/${jobId}/candidates/${id}`, {
                                         method: 'POST',
-                                        headers: { 'Authorization': token || '' }
+                                        headers: {
+                                            'Authorization': token || '',
+                                            'X-XSRF-TOKEN': getCsrfToken() || ''
+                                        }
                                     })
                                         .then(res => {
                                             if (res.ok) alert('Candidate Assigned to Job!');

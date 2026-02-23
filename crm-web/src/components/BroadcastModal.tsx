@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Send, X } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
+import { getCsrfToken } from '../utils/csrf';
 
 interface BroadcastModalProps {
     onClose: () => void;
@@ -20,7 +21,8 @@ export default function BroadcastModal({ onClose }: BroadcastModalProps) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token || ''
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: JSON.stringify({ message })
             });

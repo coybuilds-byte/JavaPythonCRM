@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
+import { getCsrfToken } from '../utils/csrf';
 
 interface ClientFormProps {
     onSuccess: () => void;
@@ -15,7 +16,7 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
         contactPerson: '',
         email: '',
         phone: '',
-        city: '', 
+        city: '',
         state: '',
         owner: user || '' // Set initial owner
     });
@@ -32,7 +33,8 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token || ''
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: JSON.stringify(formData)
             });
@@ -53,33 +55,33 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '16px', marginTop: '20px' }}>
                 <div>
                     <label>Company Name</label>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         required
                         value={formData.companyName}
-                        onChange={e => setFormData({...formData, companyName: e.target.value})}
+                        onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                         style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                     />
                 </div>
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
                         <label>Industry</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             required
                             value={formData.industry}
-                            onChange={e => setFormData({...formData, industry: e.target.value})}
+                            onChange={e => setFormData({ ...formData, industry: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
                     <div>
                         <label>Contact Person</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             required
                             value={formData.contactPerson}
-                            onChange={e => setFormData({...formData, contactPerson: e.target.value})}
+                            onChange={e => setFormData({ ...formData, contactPerson: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
@@ -88,19 +90,19 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
                         <label>Email</label>
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             value={formData.email}
-                            onChange={e => setFormData({...formData, email: e.target.value})}
+                            onChange={e => setFormData({ ...formData, email: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
                     <div>
                         <label>Phone</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={formData.phone}
-                            onChange={e => setFormData({...formData, phone: e.target.value})}
+                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
@@ -109,19 +111,19 @@ export default function ClientForm({ onSuccess, onCancel }: ClientFormProps) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
                         <label>City</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={formData.city}
-                            onChange={e => setFormData({...formData, city: e.target.value})}
+                            onChange={e => setFormData({ ...formData, city: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
                     <div>
                         <label>State</label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={formData.state}
-                            onChange={e => setFormData({...formData, state: e.target.value})}
+                            onChange={e => setFormData({ ...formData, state: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>

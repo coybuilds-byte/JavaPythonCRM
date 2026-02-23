@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_BASE_URL } from '../config';
+import { getCsrfToken } from '../utils/csrf';
 
 interface JobOrderFormProps {
     clientId: number;
@@ -30,7 +31,8 @@ export default function JobOrderForm({ clientId, onSuccess, onCancel }: JobOrder
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token || ''
+                    'Authorization': token || '',
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: JSON.stringify(formData)
             });
@@ -47,25 +49,25 @@ export default function JobOrderForm({ clientId, onSuccess, onCancel }: JobOrder
 
     return (
         <div className="card" style={{ marginTop: '20px', border: '1px solid var(--primary)' }}>
-            <h3 style={{marginBottom: '16px', color: 'var(--primary-light)'}}>Create New Job Order</h3>
+            <h3 style={{ marginBottom: '16px', color: 'var(--primary-light)' }}>Create New Job Order</h3>
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '16px' }}>
                 <div>
                     <label>Job Title</label>
-                    <input 
-                        type="text" 
+                    <input
+                        type="text"
                         required
                         value={formData.title}
-                        onChange={e => setFormData({...formData, title: e.target.value})}
+                        onChange={e => setFormData({ ...formData, title: e.target.value })}
                         style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                     />
                 </div>
-                
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div>
                         <label>Status</label>
-                        <select 
+                        <select
                             value={formData.status}
-                            onChange={e => setFormData({...formData, status: e.target.value})}
+                            onChange={e => setFormData({ ...formData, status: e.target.value })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         >
                             <option value="OPEN">Open</option>
@@ -75,11 +77,11 @@ export default function JobOrderForm({ clientId, onSuccess, onCancel }: JobOrder
                     </div>
                     <div>
                         <label>Open Positions</label>
-                        <input 
-                            type="number" 
+                        <input
+                            type="number"
                             min="1"
                             value={formData.openPositions}
-                            onChange={e => setFormData({...formData, openPositions: parseInt(e.target.value)})}
+                            onChange={e => setFormData({ ...formData, openPositions: parseInt(e.target.value) })}
                             style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px' }}
                         />
                     </div>
@@ -87,10 +89,10 @@ export default function JobOrderForm({ clientId, onSuccess, onCancel }: JobOrder
 
                 <div>
                     <label>Description</label>
-                    <textarea 
+                    <textarea
                         rows={3}
                         value={formData.description}
-                        onChange={e => setFormData({...formData, description: e.target.value})}
+                        onChange={e => setFormData({ ...formData, description: e.target.value })}
                         style={{ width: '100%', padding: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', borderRadius: '4px', resize: 'vertical' }}
                     />
                 </div>

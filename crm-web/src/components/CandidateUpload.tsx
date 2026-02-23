@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { API_BASE_URL } from '../config'
 import { useAuth } from '../context/AuthContext'
-import './CandidateUpload.css' // We will create this or use styled components roughly
+import { getCsrfToken } from '../utils/csrf'
+import './CandidateUpload.css'
 
 interface ParsedResult {
     name: string
@@ -62,7 +63,8 @@ export default function CandidateUpload({ authHeader }: CandidateUploadProps) {
             const response = await fetch(`${API_BASE_URL}/api/candidates/parse`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': authHeader
+                    'Authorization': authHeader,
+                    'X-XSRF-TOKEN': getCsrfToken() || ''
                 },
                 body: formData,
             })
