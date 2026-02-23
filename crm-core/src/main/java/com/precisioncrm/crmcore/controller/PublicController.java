@@ -30,8 +30,9 @@ public class PublicController {
             response.put("status", "Success");
             response.put("aiServiceResponse", healthResponse);
         } catch (Exception e) {
+            System.err.println("Public diagnosis error: " + e.getMessage());
             response.put("status", "Failure");
-            response.put("error", e.getMessage());
+            response.put("error", "Failed to connect to AI Service. Please check server logs.");
         }
 
         return ResponseEntity.ok(response);

@@ -28,8 +28,8 @@ public class EmailController {
             emailService.sendSimpleMessage(to, subject, body);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Failed to send email: " + e.getMessage());
+            System.err.println("Email sending failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to send email. Please check the logs.");
         }
     }
 }

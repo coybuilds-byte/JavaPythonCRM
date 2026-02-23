@@ -206,8 +206,9 @@ public class CandidateController {
 
             return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Error parsing resume: " + e.getMessage());
+            System.err.println("Resume parsing error: " + e.getMessage());
+            return ResponseEntity.status(500)
+                    .body("Error parsing resume. Please ensure the file is valid and the AI service is online.");
         }
     }
 
@@ -218,8 +219,8 @@ public class CandidateController {
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Error connecting to AI Search Service: " + e.getMessage());
+            System.err.println("Web search error: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error connecting to AI Search Service. Please try again later.");
         }
     }
 
@@ -234,8 +235,9 @@ public class CandidateController {
             response.put("backendResponse", healthResponse.getBody());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("Debug connection failed: " + e.getMessage());
             response.put("status", "Failure");
-            response.put("error", e.getMessage());
+            response.put("error", "Failed to reach AI service health endpoint.");
             return ResponseEntity.status(500).body(response);
         }
     }
