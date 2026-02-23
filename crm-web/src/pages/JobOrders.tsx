@@ -47,7 +47,7 @@ export default function JobOrders() {
     useEffect(() => {
         fetchJobs();
         fetchClients();
-    }, []);
+    }, [token]);
 
     const fetchJobs = async () => {
         try {
@@ -93,7 +93,7 @@ export default function JobOrders() {
 
             const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': token || ''
                 },
@@ -136,7 +136,8 @@ export default function JobOrders() {
             <div className="jobs-list">
                 {jobs.map(job => {
                     const location = job.client ? `${job.client.city}, ${job.client.state}` : 'Location TBD';
-                    const candidateCount = job.candidates ? job.candidates.length : 0;
+                    const applications = (job as any).applications || [];
+                    const candidateCount = applications.length;
 
                     return (
                         <div
