@@ -15,13 +15,19 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
         @Bean
+        public org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokenRepository() {
+                org.springframework.security.web.csrf.CookieCsrfTokenRepository repository = org.springframework.security.web.csrf.CookieCsrfTokenRepository
+                                .withHttpOnlyFalse();
+                repository.setCookieCustomizer(cookie -> cookie.sameSite("None").secure(true));
+                return repository;
+        }
+
+        @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf
-                                                .csrfTokenRepository(
-                                                                org.springframework.security.web.csrf.CookieCsrfTokenRepository
-                                                                                .withHttpOnlyFalse())
+                                                .csrfTokenRepository(csrfTokenRepository())
                                                 .csrfTokenRequestHandler(
                                                                 new org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler()))
                                 .addFilterAfter(new CsrfCookieFilter(),
@@ -56,7 +62,9 @@ public class SecurityConfig {
                                 "https://www.psmtechstaffing.com",
                                 "https://psmtechstaffing.com"));
                 configuration.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
+                configuration.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type", "X-XSRF-TOKEN",
+                                "X-Requested-With"));
+                configuration.setExposedHeaders(java.util.Arrays.asList("X-XSRF-TOKEN"));
                 configuration.setAllowCredentials(true);
                 org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);

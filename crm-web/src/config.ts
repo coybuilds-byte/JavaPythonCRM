@@ -1,3 +1,9 @@
-// Configuration for API Base URL
-// Can be overridden by VITE_API_URL or defaults to production backend
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    if (window.location.hostname.includes('psmtechstaffing') || window.location.hostname.includes('onrender')) {
+        return 'https://crm-backend-ctja.onrender.com';
+    }
+    return 'http://localhost:8080';
+};
+
+export const API_BASE_URL = getBaseUrl();

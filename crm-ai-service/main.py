@@ -238,7 +238,7 @@ def search_candidates(query: str):
     except Exception as e:
         print(f"Critical error in search_candidates: {str(e)}")
         # Return empty list or basic error structure instead of 500
-        return {"results": [], "error": str(e)}
+        return {"results": [], "error": "Search service is temporarily unavailable. Please try again later."}
 
 @app.get("/health")
 def health():
