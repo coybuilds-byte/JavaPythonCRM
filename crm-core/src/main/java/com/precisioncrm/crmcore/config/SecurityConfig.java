@@ -34,6 +34,7 @@ public class SecurityConfig {
                                                 org.springframework.security.web.authentication.www.BasicAuthenticationFilter.class)
                                 .authorizeHttpRequests((requests) -> requests
                                                 .requestMatchers("/", "/error", "/api/public/**",
+                                                                "/api/candidates", "/api/candidates/**",
                                                                 "/api/candidates/parse",
                                                                 "/api/candidates/debug-connection", "/api/dashboard",
                                                                 "/api/dashboard/**",
