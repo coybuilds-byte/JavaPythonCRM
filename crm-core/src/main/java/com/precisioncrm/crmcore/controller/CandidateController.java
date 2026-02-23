@@ -30,6 +30,9 @@ public class CandidateController {
     @Value("${AI_SERVICE_URL:http://localhost:8000}")
     private String aiServiceUrl;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.TeamsWebhookService teamsWebhookService;
+
     @GetMapping
     public List<Candidate> getAll() {
         return candidateRepository.findAll();
@@ -71,6 +74,9 @@ public class CandidateController {
             to = "jesse@precisionsourcemanagement.com";
 
         emailService.sendSimpleMessage(to, subject, body);
+
+        // Teams Alert
+        teamsWebhookService.sendCandidateAlert(saved.getName(), saved.getEmail(), saved.getOwner(), saved.getId());
 
         return saved;
     }
@@ -203,6 +209,10 @@ public class CandidateController {
 
             emailService.sendSimpleMessage(to, subject, emailBody);
             System.out.println("Candidate Saved and Email Sent for: " + savedCandidate.getName());
+
+            // Teams Alert
+            teamsWebhookService.sendCandidateAlert(savedCandidate.getName(), savedCandidate.getEmail(),
+                    savedCandidate.getOwner(), savedCandidate.getId());
 
             return ResponseEntity.ok(savedCandidate);
         } catch (Exception e) {

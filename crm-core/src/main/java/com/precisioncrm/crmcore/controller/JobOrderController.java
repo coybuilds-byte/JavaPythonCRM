@@ -18,6 +18,9 @@ public class JobOrderController {
     @Autowired
     private com.precisioncrm.crmcore.service.NotificationService notificationService;
 
+    @Autowired
+    private com.precisioncrm.crmcore.service.TeamsWebhookService teamsWebhookService;
+
     @GetMapping
     public List<JobOrder> getAll() {
         return jobOrderRepository.findAll();
@@ -52,6 +55,12 @@ public class JobOrderController {
                 "New Job Order: " + saved.getTitle() + " for "
                         + (saved.getClient() != null ? saved.getClient().getCompanyName() : "Unknown Client"),
                 "JOB", saved.getId());
+
+        // Teams Alert
+        teamsWebhookService.sendJobOrderAlert(saved.getTitle(),
+                (saved.getClient() != null ? saved.getClient().getCompanyName() : "Unknown Client"),
+                saved.getId());
+
         return ResponseEntity.ok(saved);
     }
 
