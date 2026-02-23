@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter, MoreHorizontal, MapPin } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import './JobOrders.css';
 
 interface Client {
@@ -15,14 +17,15 @@ interface JobOrder {
     title: string;
     client: Client | null;
     status: string;
-    candidates: any[];
+    applications: any[];
     description: string;
-    sizzle?: string; // New
+    sizzle?: string;
     // salary: string; // Not in backend yet
 }
 
 export default function JobOrders() {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [jobs, setJobs] = useState<JobOrder[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,7 +51,9 @@ export default function JobOrders() {
 
     const fetchJobs = async () => {
         try {
-            const res = await fetch('/api/job-orders');
+            const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (!res.ok) throw new Error('Failed to fetch job orders');
             const data = await res.json();
             setJobs(data);
@@ -62,7 +67,9 @@ export default function JobOrders() {
 
     const fetchClients = async () => {
         try {
-            const res = await fetch('/api/clients');
+            const res = await fetch(`${API_BASE_URL}/api/clients`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setClients(data);
@@ -84,9 +91,9 @@ export default function JobOrders() {
                 client: client,
             };
 
-            const res = await fetch('/api/job-orders', {
+            const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': token || '' },
                 body: JSON.stringify(payload)
             });
 
@@ -126,7 +133,7 @@ export default function JobOrders() {
             <div className="jobs-list">
                 {jobs.map(job => {
                     const location = job.client ? `${job.client.city}, ${job.client.state}` : 'Location TBD';
-                    const candidateCount = job.candidates ? job.candidates.length : 0;
+                    const candidateCount = job.applications ? job.applications.length : 0;
 
                     return (
                         <div
