@@ -1,8 +1,9 @@
-import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 interface AuthContextType {
     user: string | null;
-    token: string | null; 
+    token: string | null;
     login: (username: string, token: string) => void;
     logout: () => void;
     isAuthenticated: boolean;
@@ -18,7 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (user) localStorage.setItem('user', user);
         else localStorage.removeItem('user');
-        
+
         if (token) localStorage.setItem('token', token);
         else localStorage.removeItem('token');
     }, [user, token]);

@@ -1,4 +1,4 @@
-
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -10,7 +10,7 @@ import CandidatesList from './pages/CandidatesList';
 import ClientsList from './pages/ClientsList';
 import JobOrders from './pages/JobOrders';
 import Reports from './pages/Reports';
-import './App.css'; 
+import './App.css';
 
 const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
     const { isAuthenticated } = useAuth();
@@ -34,9 +34,9 @@ function AppContent() {
             <main className="main-content">
                 <Routes>
                     <Route path="/login" element={<LoginRoute />} />
-                    
+
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    
+
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                     <Route path="/candidates" element={<ProtectedRoute><CandidatesList /></ProtectedRoute>} />
                     <Route path="/candidates/:id" element={<ProtectedRoute><CandidateProfile /></ProtectedRoute>} />
@@ -51,13 +51,13 @@ function AppContent() {
 }
 
 function App() {
-  return (
-    <Router>
-        <AuthProvider>
-            <AppContent />
-        </AuthProvider>
-    </Router>
-  );
+    return (
+        <Router>
+            <AuthProvider>
+                <AppContent />
+            </AuthProvider>
+        </Router>
+    );
 }
 
 export default App;

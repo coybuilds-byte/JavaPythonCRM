@@ -15,7 +15,8 @@ interface Client {
     jobOrders?: any[]; // We only need length, type optional for now
 }
 
-import { DEFAULT_PREFS, type ViewPreferences } from '../components/ViewSettingsModal'; // Import types
+import { DEFAULT_PREFS } from '../components/ViewSettingsModal';
+import type { ViewPreferences } from '../components/ViewSettingsModal';
 import { API_BASE_URL } from '../config';
 
 export default function ClientsList() {
