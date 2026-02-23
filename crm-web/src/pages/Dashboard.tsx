@@ -1,4 +1,3 @@
-```javascript
 import { useState, useEffect } from 'react';
 import { Search, Users, Briefcase, FileText, Activity, Clock, Plus, ArrowUpRight, TrendingUp, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -13,7 +12,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch(`${ API_BASE_URL } /api/dashboard`, {
+                const res = await fetch(`${API_BASE_URL}/api/dashboard`, {
                     headers: { 'Authorization': token || '' }
                 });
                 if (res.ok) {
@@ -21,7 +20,6 @@ export default function Dashboard() {
                     setStats(data);
                 } else {
                     console.error("Failed to fetch dashboard stats:", res.status, res.statusText);
-                    // Initialize with default values if fetch fails
                     setStats({
                         activeCandidates: 0,
                         openJobOrders: 0,
@@ -32,7 +30,6 @@ export default function Dashboard() {
                 }
             } catch (error) {
                 console.error("Error loading dashboard stats", error);
-                // Initialize with default values on network error
                 setStats({
                     activeCandidates: 0,
                     openJobOrders: 0,
@@ -45,15 +42,15 @@ export default function Dashboard() {
             }
         };
         fetchStats();
-    }, []);
+    }, [token]);
 
-    // Merge recent items for Activity Feed (Sort by ID/Date desc approximation)
-    const activities = [
-        ...stats.recentCandidates.map((c: any) => ({ type: 'candidate', date: c.id, text: `New candidate added: ${ c.name } (${ c.currentTitle || 'No Title' })` })),
-        ...stats.recentJobs.map((j: any) => ({ type: 'job', date: j.id, text: `New Job Order: ${ j.title } for ${ j.client?.companyName || 'Unknown Client' }` }))
-    ].sort((a, b) => b.date - a.date).slice(0, 10);
+    const activities = stats ? [
+        ...stats.recentCandidates.map((c: any) => ({ type: 'candidate', date: c.id, text: `New candidate added: ${c.name} (${c.currentTitle || 'No Title'})` })),
+        ...stats.recentJobs.map((j: any) => ({ type: 'job', date: j.id, text: `New Job Order: ${j.title} for ${j.client?.companyName || 'Unknown Client'}` }))
+    ].sort((a, b) => b.date - a.date).slice(0, 10) : [];
 
     if (loading) return <div className="page-container">Loading Dashboard...</div>;
+    if (!stats) return <div className="page-container">Error loading stats.</div>;
 
     return (
         <div className="dashboard-container">
@@ -87,18 +84,17 @@ export default function Dashboard() {
 
             {/* Middle Section: Main Content Grid */}
             <div className="main-grid">
-                
+
                 {/* Left Column: Management Tables */}
                 <div className="management-column">
-                    
+
                     {/* Candidate Management */}
                     <div className="section-card card">
                         <div className="section-header">
                             <h3>Recent Candidates</h3>
                         </div>
                         <div className="search-bar">
-                             {/* Placeholder search logic could go here */}
-                             <div style={{color:'gray', fontSize:'0.9em'}}>Latest 5 entries</div>
+                            <div style={{ color: 'gray', fontSize: '0.9em' }}>Latest 5 entries</div>
                         </div>
                         <table className="mini-table">
                             <thead>
@@ -114,14 +110,14 @@ export default function Dashboard() {
                                     <tr key={c.id}>
                                         <td>{c.name}</td>
                                         <td>{c.currentTitle}</td>
-                                        <td><span className={`status - pill ${ c.status ? c.status.toLowerCase() : 'new' } `}>{c.status || 'New'}</span></td>
+                                        <td><span className={`status-pill ${c.status ? c.status.toLowerCase() : 'new'}`}>{c.status || 'New'}</span></td>
                                         <td>{c.location || 'N/A'}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                         <div className="section-footer">
-                             <a href="/candidates" className="btn-text">View All</a>
+                            <a href="/candidates" className="btn-text">View All</a>
                         </div>
                     </div>
 
@@ -143,7 +139,7 @@ export default function Dashboard() {
                                 {stats.recentJobs.map((j: any) => (
                                     <tr key={j.id}>
                                         <td>{j.title}</td>
-                                        <td><span className={`status - pill ${ j.status ? j.status.toLowerCase() : 'open' } `}>{j.status}</span></td>
+                                        <td><span className={`status-pill ${j.status ? j.status.toLowerCase() : 'open'}`}>{j.status}</span></td>
                                         <td>{j.openPositions || 1}</td>
                                     </tr>
                                 ))}
@@ -166,7 +162,7 @@ export default function Dashboard() {
                                     </div>
                                 </li>
                             ))}
-                            {activities.length === 0 && <li style={{color:'gray'}}>No recent activity.</li>}
+                            {activities.length === 0 && <li style={{ color: 'gray' }}>No recent activity.</li>}
                         </ul>
                     </div>
                 </div>
@@ -179,22 +175,22 @@ export default function Dashboard() {
                     <div className="chart-placeholder">
                         <h4>Placements This Month</h4>
                         <div className="bar-chart-mock">
-                             <div className="bar" style={{height: '40%'}}></div>
-                             <div className="bar" style={{height: '60%'}}></div>
-                             <div className="bar" style={{height: '80%'}}></div>
-                             <div className="bar" style={{height: '30%'}}></div>
-                             <div className="bar" style={{height: '50%'}}></div>
-                             <div className="bar" style={{height: '70%'}}></div>
-                             <div className="bar" style={{height: '90%'}}></div>
+                            <div className="bar" style={{ height: '40%' }}></div>
+                            <div className="bar" style={{ height: '60%' }}></div>
+                            <div className="bar" style={{ height: '80%' }}></div>
+                            <div className="bar" style={{ height: '30%' }}></div>
+                            <div className="bar" style={{ height: '50%' }}></div>
+                            <div className="bar" style={{ height: '70%' }}></div>
+                            <div className="bar" style={{ height: '90%' }}></div>
                         </div>
                     </div>
                     <div className="chart-placeholder">
-                         <h4>Pipeline Overview</h4>
-                         <div className="line-chart-mock">
+                        <h4>Pipeline Overview</h4>
+                        <div className="line-chart-mock">
                             <svg viewBox="0 0 100 30" className="line-chart-svg">
                                 <polyline points="0,30 20,20 40,25 60,10 80,15 100,5" fill="none" stroke="var(--primary)" strokeWidth="2" />
                             </svg>
-                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
