@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import { Plus, Filter, MoreHorizontal, MapPin } from 'lucide-react';
 import './JobOrders.css';
 
@@ -23,6 +25,7 @@ interface JobOrder {
 
 export default function JobOrders() {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [jobs, setJobs] = useState<JobOrder[]>([]);
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,7 +51,9 @@ export default function JobOrders() {
 
     const fetchJobs = async () => {
         try {
-            const res = await fetch('/api/job-orders');
+            const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (!res.ok) throw new Error('Failed to fetch job orders');
             const data = await res.json();
             setJobs(data);
@@ -62,7 +67,9 @@ export default function JobOrders() {
 
     const fetchClients = async () => {
         try {
-            const res = await fetch('/api/clients');
+            const res = await fetch(`${API_BASE_URL}/api/clients`, {
+                headers: { 'Authorization': token || '' }
+            });
             if (res.ok) {
                 const data = await res.json();
                 setClients(data);
@@ -75,18 +82,21 @@ export default function JobOrders() {
     const handleCreateJob = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const client = clients.find(c => c.id.toString() === newJob.clientId);
             const payload = {
                 title: newJob.title,
                 description: newJob.description,
-                status: newJob.status,
+                status: newJob.status, // Values are now uppercase in modal
                 sizzle: newJob.sizzle,
-                client: client,
+                client: { id: parseInt(newJob.clientId) },
+                openPositions: 1
             };
 
-            const res = await fetch('/api/job-orders', {
+            const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': token || ''
+                },
                 body: JSON.stringify(payload)
             });
 
@@ -192,9 +202,9 @@ export default function JobOrders() {
                                     value={newJob.status}
                                     onChange={e => setNewJob({ ...newJob, status: e.target.value })}
                                 >
-                                    <option value="Open">Open</option>
-                                    <option value="Closed">Closed</option>
-                                    <option value="Hold">Hold</option>
+                                    <option value="OPEN">Open</option>
+                                    <option value="CLOSED">Closed</option>
+                                    <option value="HOLD">Hold</option>
                                 </select>
                             </div>
                             <div className="form-group">

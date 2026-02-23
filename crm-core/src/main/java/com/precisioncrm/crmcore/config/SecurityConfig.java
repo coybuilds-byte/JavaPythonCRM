@@ -22,7 +22,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests((requests) -> requests
                                                 .requestMatchers("/", "/error", "/api/public/**",
                                                                 "/api/candidates/parse",
-                                                                "/api/candidates/debug-connection", "/api/dashboard")
+                                                                "/api/candidates/debug-connection", "/api/dashboard",
+                                                                "/api/job-orders/**", "/api/clients/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/notifications/**").authenticated()
                                                 // showing
