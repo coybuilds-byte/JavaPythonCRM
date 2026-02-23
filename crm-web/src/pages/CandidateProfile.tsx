@@ -38,17 +38,28 @@ export default function CandidateProfile() {
                     fetch(`${API_BASE_URL}/api/job-orders`, { headers })
                 ]);
 
-                if (candRes.ok) {
-                    const data = await candRes.json();
-                    setCandidate(data);
+                if (!candRes.ok) {
+                    const errorMsg = await candRes.text().catch(() => 'No error detail');
+                    throw new Error(`Candidate Fetch Failed: ${candRes.status} ${errorMsg}`);
                 }
 
+                const candType = candRes.headers.get("content-type");
+                if (!candType || !candType.includes("application/json")) {
+                    throw new Error("Expected JSON response for candidate, but received non-JSON content.");
+                }
+                const candData = await candRes.json();
+                setCandidate(candData);
+
                 if (jobsRes.ok) {
-                    const data = await jobsRes.json();
-                    setOpenJobs(data.filter((j: any) => j.status === 'OPEN' || j.status === 'Open'));
+                    const jobsType = jobsRes.headers.get("content-type");
+                    if (jobsType && jobsType.includes("application/json")) {
+                        const jobsData = await jobsRes.json();
+                        setOpenJobs(jobsData.filter((j: any) => j.status === 'OPEN' || j.status === 'Open'));
+                    }
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Profile Load Error:", err);
+                // We could set an error state here, but for now just log it
             } finally {
                 setLoading(false);
             }

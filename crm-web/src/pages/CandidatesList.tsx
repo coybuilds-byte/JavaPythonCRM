@@ -80,16 +80,23 @@ export default function CandidatesList() {
             const url = searchQuery
                 ? `${API_BASE_URL}/api/candidates/search?query=${encodeURIComponent(searchQuery)}`
                 : `${API_BASE_URL}/api/candidates`;
-            const res = await fetch(url, { headers: { 'Authorization': authHeader || '' } });
-            if (res.ok) {
-                const data = await res.json();
-                setCandidates(data);
-            } else {
-                setError('Failed to fetch candidates.');
+            const res = await fetch(url, { headers: { 'Authorization': token || '' } });
+
+            if (!res.ok) {
+                const errorText = await res.text().catch(() => 'No detail');
+                throw new Error(`Fetch Candidates Failed: ${res.status} ${errorText}`);
             }
-        } catch (error) {
-            console.error('Error fetching candidates:', error);
-            setError('Network error.');
+
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Expected JSON response for candidates, but received non-JSON content.");
+            }
+
+            const data = await res.json();
+            setCandidates(data);
+        } catch (err) {
+            console.error(err);
+            setError('Could not load candidates');
         } finally {
             setLoading(false);
         }

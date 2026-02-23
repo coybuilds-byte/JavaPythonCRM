@@ -15,19 +15,19 @@ export default function Dashboard() {
                 const res = await fetch(`${API_BASE_URL}/api/dashboard`, {
                     headers: { 'Authorization': token || '' }
                 });
-                if (res.ok) {
-                    const data = await res.json();
-                    setStats(data);
-                } else {
-                    console.error("Failed to fetch dashboard stats:", res.status, res.statusText);
-                    setStats({
-                        activeCandidates: 0,
-                        openJobOrders: 0,
-                        interviewsScheduled: 0,
-                        recentCandidates: [],
-                        recentJobs: []
-                    });
+
+                if (!res.ok) {
+                    const errorText = await res.text().catch(() => 'No detail');
+                    throw new Error(`Fetch Dashboard Failed: ${res.status} ${errorText}`);
                 }
+
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Expected JSON response for dashboard, but received non-JSON content.");
+                }
+
+                const data = await res.json();
+                setStats(data);
             } catch (error) {
                 console.error("Error loading dashboard stats", error);
                 setStats({
