@@ -1,27 +1,45 @@
+```javascript
 import { useState, useEffect } from 'react';
-import { Users, Briefcase, Calendar } from 'lucide-react';
+import { Search, Users, Briefcase, FileText, Activity, Clock, Plus, ArrowUpRight, TrendingUp, Calendar } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import './Dashboard.css';
 
 export default function Dashboard() {
-    const [stats, setStats] = useState<any>({
-        activeCandidates: 0,
-        openJobOrders: 0,
-        interviewsScheduled: 0,
-        recentCandidates: [],
-        recentJobs: []
-    });
+    const { token } = useAuth();
+    const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch('/api/dashboard');
+                const res = await fetch(`${ API_BASE_URL } /api/dashboard`, {
+                    headers: { 'Authorization': token || '' }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setStats(data);
+                } else {
+                    console.error("Failed to fetch dashboard stats:", res.status, res.statusText);
+                    // Initialize with default values if fetch fails
+                    setStats({
+                        activeCandidates: 0,
+                        openJobOrders: 0,
+                        interviewsScheduled: 0,
+                        recentCandidates: [],
+                        recentJobs: []
+                    });
                 }
             } catch (error) {
                 console.error("Error loading dashboard stats", error);
+                // Initialize with default values on network error
+                setStats({
+                    activeCandidates: 0,
+                    openJobOrders: 0,
+                    interviewsScheduled: 0,
+                    recentCandidates: [],
+                    recentJobs: []
+                });
             } finally {
                 setLoading(false);
             }
@@ -31,8 +49,8 @@ export default function Dashboard() {
 
     // Merge recent items for Activity Feed (Sort by ID/Date desc approximation)
     const activities = [
-        ...stats.recentCandidates.map((c: any) => ({ type: 'candidate', date: c.id, text: `New candidate added: ${c.name} (${c.currentTitle || 'No Title'})` })),
-        ...stats.recentJobs.map((j: any) => ({ type: 'job', date: j.id, text: `New Job Order: ${j.title} for ${j.client?.companyName || 'Unknown Client'}` }))
+        ...stats.recentCandidates.map((c: any) => ({ type: 'candidate', date: c.id, text: `New candidate added: ${ c.name } (${ c.currentTitle || 'No Title' })` })),
+        ...stats.recentJobs.map((j: any) => ({ type: 'job', date: j.id, text: `New Job Order: ${ j.title } for ${ j.client?.companyName || 'Unknown Client' }` }))
     ].sort((a, b) => b.date - a.date).slice(0, 10);
 
     if (loading) return <div className="page-container">Loading Dashboard...</div>;
@@ -96,7 +114,7 @@ export default function Dashboard() {
                                     <tr key={c.id}>
                                         <td>{c.name}</td>
                                         <td>{c.currentTitle}</td>
-                                        <td><span className={`status-pill ${c.status ? c.status.toLowerCase() : 'new'}`}>{c.status || 'New'}</span></td>
+                                        <td><span className={`status - pill ${ c.status ? c.status.toLowerCase() : 'new' } `}>{c.status || 'New'}</span></td>
                                         <td>{c.location || 'N/A'}</td>
                                     </tr>
                                 ))}
@@ -125,7 +143,7 @@ export default function Dashboard() {
                                 {stats.recentJobs.map((j: any) => (
                                     <tr key={j.id}>
                                         <td>{j.title}</td>
-                                        <td><span className={`status-pill ${j.status ? j.status.toLowerCase() : 'open'}`}>{j.status}</span></td>
+                                        <td><span className={`status - pill ${ j.status ? j.status.toLowerCase() : 'open' } `}>{j.status}</span></td>
                                         <td>{j.openPositions || 1}</td>
                                     </tr>
                                 ))}

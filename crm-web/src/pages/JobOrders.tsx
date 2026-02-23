@@ -52,7 +52,7 @@ export default function JobOrders() {
     const fetchJobs = async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/job-orders`, {
-                headers: { 'Authorization': token || '' }
+                headers: token ? { 'Authorization': token } : {}
             });
             if (!res.ok) throw new Error('Failed to fetch job orders');
             const data = await res.json();
@@ -68,7 +68,7 @@ export default function JobOrders() {
     const fetchClients = async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/api/clients`, {
-                headers: { 'Authorization': token || '' }
+                headers: token ? { 'Authorization': token } : {}
             });
             if (res.ok) {
                 const data = await res.json();
@@ -95,7 +95,7 @@ export default function JobOrders() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token || ''
+                    ...(token ? { 'Authorization': token } : {})
                 },
                 body: JSON.stringify(payload)
             });

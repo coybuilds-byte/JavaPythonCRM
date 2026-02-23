@@ -1,6 +1,9 @@
+```typescript
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Mail, Phone, MapPin, FileText, Calendar, Clock, Briefcase, Plus, Send } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Mail, Phone, MapPin, Globe, Linkedin, FileText, ExternalLink, Calendar, MapPinHouse, Send, Tag, Pencil, Trash2, Clock, Briefcase, Plus } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../config';
 import './CandidateProfile.css';
 
 interface Candidate {
@@ -17,24 +20,26 @@ interface Candidate {
 
 export default function CandidateProfile() {
     const { id } = useParams();
+    const { token } = useAuth();
+    const navigate = useNavigate();
     const [candidate, setCandidate] = useState<Candidate | null>(null);
     const [loading, setLoading] = useState(true);
 
     const [openJobs, setOpenJobs] = useState([]);
 
     useEffect(() => {
-        const fetchCandidate = async () => {
-            if (!id) return;
+        const fetchData = async () => {
+            setLoading(true);
             try {
-                const res = await fetch(`/api/candidates/${id}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setCandidate(data);
-                }
-            } catch (err) { console.error(err); } finally { setLoading(false); }
-        };
+                const headers = { 'Authorization': token || '' };
+                const [candRes, jobsRes] = await Promise.all([
+                    fetch(`${ API_BASE_URL } /api/candidates / ${ id } `, { headers }),
+                    fetch(`${ API_BASE_URL } /api/job - orders`, { headers })
+                ]);
 
-        const fetchJobs = async () => {
+                if (candRes.ok) {
+                    const data = await candRes.json();
+                    setCandidate(data);
              try {
                  const res = await fetch('/api/job-orders');
                  if (res.ok) {
@@ -143,7 +148,10 @@ export default function CandidateProfile() {
                                 if (e.target.value) {
                                     // Assign logic
                                     const jobId = e.target.value;
-                                    fetch(`/api/job-orders/${jobId}/candidates/${id}`, { method: 'POST' })
+                                    fetch(`${ API_BASE_URL } /api/job - orders / ${ jobId } /candidates/${ id } `, { 
+                                        method: 'POST',
+                                        headers: { 'Authorization': token || '' }
+                                    })
                                         .then(res => {
                                             if(res.ok) alert('Candidate Assigned to Job!');
                                             else alert('Assignment Failed');

@@ -23,6 +23,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/", "/error", "/api/public/**",
                                                                 "/api/candidates/parse",
                                                                 "/api/candidates/debug-connection", "/api/dashboard",
+                                                                "/api/dashboard/**",
                                                                 "/api/job-orders", "/api/job-orders/**",
                                                                 "/api/clients", "/api/clients/**")
                                                 .permitAll()
